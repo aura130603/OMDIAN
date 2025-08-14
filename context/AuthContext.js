@@ -107,9 +107,15 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     // Check if user is logged in from localStorage
-    const savedUser = localStorage.getItem('omdian_user')
-    if (savedUser) {
-      setUser(JSON.parse(savedUser))
+    try {
+      if (typeof window !== 'undefined') {
+        const savedUser = localStorage.getItem('omdian_user')
+        if (savedUser) {
+          setUser(JSON.parse(savedUser))
+        }
+      }
+    } catch (error) {
+      console.error('Error loading user from localStorage:', error)
     }
     setLoading(false)
   }, [])
@@ -122,7 +128,9 @@ export const AuthProvider = ({ children }) => {
     if (foundUser) {
       const { password: _, ...userWithoutPassword } = foundUser
       setUser(userWithoutPassword)
-      localStorage.setItem('omdian_user', JSON.stringify(userWithoutPassword))
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('omdian_user', JSON.stringify(userWithoutPassword))
+      }
       return { success: true }
     } else {
       return { success: false, message: 'Username atau password salah' }
@@ -131,7 +139,9 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     setUser(null)
-    localStorage.removeItem('omdian_user')
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('omdian_user')
+    }
   }
 
   const register = async (userData) => {

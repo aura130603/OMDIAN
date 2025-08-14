@@ -2,6 +2,13 @@ import { useState, useContext, useEffect } from 'react'
 import { AuthContext } from '../context/AuthContext'
 import ProfileDropdown from './ProfileDropdown'
 import EmployeeModal from './EmployeeModal'
+import {
+  exportEmployeeReport,
+  exportTrainingReport,
+  exportMonitoringReport,
+  exportToPDF,
+  generateSummaryStats
+} from '../utils/exportUtils'
 
 export default function EnhancedAdminDashboard({ user }) {
   const { 
@@ -174,14 +181,23 @@ export default function EnhancedAdminDashboard({ user }) {
     }
   }
 
-  const exportToExcel = () => {
-    // In a real application, you would use a library like xlsx
-    alert('Fitur export Excel akan segera tersedia')
+  const handleExportEmployeeExcel = () => {
+    exportEmployeeReport(allUsers, allTraining)
   }
 
-  const exportToPDF = () => {
-    // In a real application, you would use a library like jsPDF
-    alert('Fitur export PDF akan segera tersedia')
+  const handleExportTrainingExcel = () => {
+    exportTrainingReport(allTraining)
+  }
+
+  const handleExportMonitoringExcel = () => {
+    exportMonitoringReport(allUsers, allTraining)
+  }
+
+  const handleExportPDF = (type) => {
+    const title = type === 'employee' ? 'Laporan Data Pegawai' :
+                  type === 'training' ? 'Laporan Data Pelatihan' :
+                  'Laporan Monitoring Kompetensi'
+    exportToPDF(title, [])
   }
 
   const filteredEmployees = getFilteredEmployees()
@@ -268,10 +284,10 @@ export default function EnhancedAdminDashboard({ user }) {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                   <h2 className="card-title">Statistik Pengembangan Kompetensi</h2>
                   <div style={{ display: 'flex', gap: '10px' }}>
-                    <button className="btn btn-secondary" onClick={exportToExcel}>
-                      📊 Export Excel
+                    <button className="btn btn-secondary" onClick={handleExportEmployeeExcel}>
+                      📊 Export Data Pegawai
                     </button>
-                    <button className="btn btn-secondary" onClick={exportToPDF}>
+                    <button className="btn btn-secondary" onClick={() => handleExportPDF('overview')}>
                       📄 Export PDF
                     </button>
                   </div>
@@ -489,18 +505,18 @@ export default function EnhancedAdminDashboard({ user }) {
             {/* Training Data Tab */}
             {activeTab === 'training' && (
               <div>
-                <div style={{ 
-                  display: 'flex', 
-                  justifyContent: 'space-between', 
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
                   alignItems: 'center',
                   marginBottom: '20px'
                 }}>
                   <h2 className="card-title">Data Pelatihan ({filteredTraining.length})</h2>
                   <div style={{ display: 'flex', gap: '10px' }}>
-                    <button className="btn btn-secondary" onClick={exportToExcel}>
-                      📊 Export Excel
+                    <button className="btn btn-secondary" onClick={handleExportTrainingExcel}>
+                      📊 Export Data Pelatihan
                     </button>
-                    <button className="btn btn-secondary" onClick={exportToPDF}>
+                    <button className="btn btn-secondary" onClick={() => handleExportPDF('training')}>
                       📄 Export PDF
                     </button>
                   </div>
@@ -622,7 +638,17 @@ export default function EnhancedAdminDashboard({ user }) {
             {/* Monitoring Tab */}
             {activeTab === 'monitoring' && (
               <div>
-                <h2 className="card-title">Monitoring Kelengkapan Data Tahun {currentYear}</h2>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                  <h2 className="card-title">Monitoring Kelengkapan Data Tahun {currentYear}</h2>
+                  <div style={{ display: 'flex', gap: '10px' }}>
+                    <button className="btn btn-secondary" onClick={handleExportMonitoringExcel}>
+                      📊 Export Monitoring
+                    </button>
+                    <button className="btn btn-secondary" onClick={() => handleExportPDF('monitoring')}>
+                      📄 Export PDF
+                    </button>
+                  </div>
+                </div>
                 
                 <div className="profile-grid" style={{ marginBottom: '30px' }}>
                   <div className="profile-item">

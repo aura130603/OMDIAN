@@ -1,6 +1,7 @@
 import { useState, useContext, useEffect } from 'react'
 import { AuthContext } from '../context/AuthContext'
 import TrainingModal from './TrainingModal'
+import ProfileDropdown from './ProfileDropdown'
 
 export default function EmployeeDashboard({ user }) {
   const { logout, getUserTrainingData, addTrainingData, updateTrainingData } = useContext(AuthContext)
@@ -60,13 +61,7 @@ export default function EmployeeDashboard({ user }) {
           <div className="dashboard-nav">
             <h1 className="dashboard-title">OMDIAN - Dashboard Pegawai</h1>
             <div className="dashboard-user">
-              <div className="user-info">
-                <div className="user-name">{user.nama}</div>
-                <div className="user-role">NIP: {user.nip}</div>
-              </div>
-              <button className="btn-logout" onClick={logout}>
-                Keluar
-              </button>
+              <ProfileDropdown user={user} />
             </div>
           </div>
         </div>

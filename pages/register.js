@@ -80,137 +80,144 @@ export default function Register() {
     <div className="auth-container">
       <div className="auth-card" style={{ maxWidth: '600px' }}>
         <div className="auth-header">
-          <h1 className="auth-title">Daftar Akun OMDIAN</h1>
+          <h1 className="auth-title">Registrasi</h1>
           <p className="auth-subtitle">
-            Buat akun baru untuk sistem pengembangan kompetensi
+            Buat akun baru untuk mengakses<br />
+            sistem pengembangan kompetensi
           </p>
         </div>
 
         <form onSubmit={handleSubmit}>
-          <div className="form-row">
+          <div className="form-section">
+            <h3 className="form-section-title">Informasi Akun</h3>
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="username" className="form-label">
+                  Username *
+                </label>
+                <input
+                  type="text"
+                  id="username"
+                  name="username"
+                  className="form-input"
+                  value={formData.username}
+                  onChange={handleChange}
+                  required
+                  placeholder="Username untuk login"
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="nip" className="form-label">
+                  NIP *
+                </label>
+                <input
+                  type="text"
+                  id="nip"
+                  name="nip"
+                  className="form-input"
+                  value={formData.nip}
+                  onChange={handleChange}
+                  required
+                  placeholder="18 digit NIP"
+                  maxLength={18}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="form-section">
+            <h3 className="form-section-title">Data Pegawai</h3>
             <div className="form-group">
-              <label htmlFor="username" className="form-label">
-                Username *
+              <label htmlFor="nama" className="form-label">
+                Nama Lengkap *
               </label>
               <input
                 type="text"
-                id="username"
-                name="username"
+                id="nama"
+                name="nama"
                 className="form-input"
-                value={formData.username}
+                value={formData.nama}
                 onChange={handleChange}
                 required
-                placeholder="Username login"
+                placeholder="Nama lengkap sesuai SK"
               />
             </div>
 
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="pangkat" className="form-label">
+                  Pangkat *
+                </label>
+                <select
+                  id="pangkat"
+                  name="pangkat"
+                  className="form-input"
+                  value={formData.pangkat}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">Pilih Pangkat</option>
+                  <option value="Pengatur Muda">Pengatur Muda</option>
+                  <option value="Pengatur Muda Tk. I">Pengatur Muda Tk. I</option>
+                  <option value="Pengatur">Pengatur</option>
+                  <option value="Pengatur Tk. I">Pengatur Tk. I</option>
+                  <option value="Penata Muda">Penata Muda</option>
+                  <option value="Penata Muda Tk. I">Penata Muda Tk. I</option>
+                  <option value="Penata">Penata</option>
+                  <option value="Penata Tk. I">Penata Tk. I</option>
+                  <option value="Pembina">Pembina</option>
+                  <option value="Pembina Tk. I">Pembina Tk. I</option>
+                  <option value="Pembina Utama Muda">Pembina Utama Muda</option>
+                  <option value="Pembina Utama Madya">Pembina Utama Madya</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="golongan" className="form-label">
+                  Golongan/Ruang *
+                </label>
+                <select
+                  id="golongan"
+                  name="golongan"
+                  className="form-input"
+                  value={formData.golongan}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">Pilih Golongan</option>
+                  <option value="II/a">II/a</option>
+                  <option value="II/b">II/b</option>
+                  <option value="II/c">II/c</option>
+                  <option value="II/d">II/d</option>
+                  <option value="III/a">III/a</option>
+                  <option value="III/b">III/b</option>
+                  <option value="III/c">III/c</option>
+                  <option value="III/d">III/d</option>
+                  <option value="IV/a">IV/a</option>
+                  <option value="IV/b">IV/b</option>
+                  <option value="IV/c">IV/c</option>
+                  <option value="IV/d">IV/d</option>
+                  <option value="IV/e">IV/e</option>
+                </select>
+              </div>
+            </div>
+
             <div className="form-group">
-              <label htmlFor="nip" className="form-label">
-                NIP *
+              <label htmlFor="jabatan" className="form-label">
+                Jabatan *
               </label>
               <input
                 type="text"
-                id="nip"
-                name="nip"
+                id="jabatan"
+                name="jabatan"
                 className="form-input"
-                value={formData.nip}
+                value={formData.jabatan}
                 onChange={handleChange}
                 required
-                placeholder="18 digit NIP"
-                maxLength={18}
+                placeholder="Jabatan saat ini"
               />
             </div>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="nama" className="form-label">
-              Nama Lengkap *
-            </label>
-            <input
-              type="text"
-              id="nama"
-              name="nama"
-              className="form-input"
-              value={formData.nama}
-              onChange={handleChange}
-              required
-              placeholder="Nama lengkap sesuai SK"
-            />
-          </div>
-
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="pangkat" className="form-label">
-                Pangkat *
-              </label>
-              <select
-                id="pangkat"
-                name="pangkat"
-                className="form-input"
-                value={formData.pangkat}
-                onChange={handleChange}
-                required
-              >
-                <option value="">Pilih Pangkat</option>
-                <option value="Pengatur Muda">Pengatur Muda</option>
-                <option value="Pengatur Muda Tk. I">Pengatur Muda Tk. I</option>
-                <option value="Pengatur">Pengatur</option>
-                <option value="Pengatur Tk. I">Pengatur Tk. I</option>
-                <option value="Penata Muda">Penata Muda</option>
-                <option value="Penata Muda Tk. I">Penata Muda Tk. I</option>
-                <option value="Penata">Penata</option>
-                <option value="Penata Tk. I">Penata Tk. I</option>
-                <option value="Pembina">Pembina</option>
-                <option value="Pembina Tk. I">Pembina Tk. I</option>
-                <option value="Pembina Utama Muda">Pembina Utama Muda</option>
-                <option value="Pembina Utama Madya">Pembina Utama Madya</option>
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="golongan" className="form-label">
-                Golongan/Ruang *
-              </label>
-              <select
-                id="golongan"
-                name="golongan"
-                className="form-input"
-                value={formData.golongan}
-                onChange={handleChange}
-                required
-              >
-                <option value="">Pilih Golongan</option>
-                <option value="II/a">II/a</option>
-                <option value="II/b">II/b</option>
-                <option value="II/c">II/c</option>
-                <option value="II/d">II/d</option>
-                <option value="III/a">III/a</option>
-                <option value="III/b">III/b</option>
-                <option value="III/c">III/c</option>
-                <option value="III/d">III/d</option>
-                <option value="IV/a">IV/a</option>
-                <option value="IV/b">IV/b</option>
-                <option value="IV/c">IV/c</option>
-                <option value="IV/d">IV/d</option>
-                <option value="IV/e">IV/e</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="jabatan" className="form-label">
-              Jabatan *
-            </label>
-            <input
-              type="text"
-              id="jabatan"
-              name="jabatan"
-              className="form-input"
-              value={formData.jabatan}
-              onChange={handleChange}
-              required
-              placeholder="Jabatan saat ini"
-            />
           </div>
 
           <div className="form-row">

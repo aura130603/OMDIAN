@@ -46,8 +46,8 @@ export default function Login() {
         <div className="auth-header">
           <h1 className="auth-title">OMDIAN</h1>
           <p className="auth-subtitle">
-            Pengembangan Kompetensi Diupdate Rutinan<br />
-            Pegawai BPS Kabupaten Kudus
+            Sistem Pengembangan Kompetensi<br />
+            BPS Kabupaten Kudus
           </p>
         </div>
 
@@ -109,15 +109,12 @@ export default function Login() {
           <a href="/register" className="auth-link"> Daftar sekarang</a>
         </div>
 
-        <div style={{ 
-          marginTop: '30px', 
-          padding: '15px', 
-          backgroundColor: 'var(--light-gray)', 
-          borderRadius: '8px',
+        <div className="demo-info" style={{
           fontSize: '12px',
-          color: 'var(--text-medium)'
+          color: 'var(--text-medium)',
+          textAlign: 'center'
         }}>
-          <strong>Akun Demo:</strong><br />
+          <strong>Akun Demo Tersedia:</strong><br />
           <strong>Pegawai:</strong> pegawai1 / password123<br />
           <strong>Admin:</strong> admin1 / admin123
         </div>

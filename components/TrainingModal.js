@@ -1,13 +1,16 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
+import { AuthContext } from '../context/AuthContext'
 
 export default function TrainingModal({ training, onSave, onClose }) {
+  const { user } = useContext(AuthContext)
   const [formData, setFormData] = useState({
     tema: '',
     penyelenggara: '',
     tanggalMulai: '',
     tanggalSelesai: '',
     keterangan: '',
-    sertifikat: null
+    sertifikat: null,
+    statusSertifikat: 'belum_upload' // belum_upload, sudah_upload
   })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -20,7 +23,8 @@ export default function TrainingModal({ training, onSave, onClose }) {
         tanggalMulai: training.tanggalMulai || '',
         tanggalSelesai: training.tanggalSelesai || '',
         keterangan: training.keterangan || '',
-        sertifikat: training.sertifikat || null
+        sertifikat: training.sertifikat || null,
+        statusSertifikat: training.sertifikat ? 'sudah_upload' : 'belum_upload'
       })
     }
   }, [training])
@@ -40,7 +44,8 @@ export default function TrainingModal({ training, onSave, onClose }) {
       // For demo purposes, we'll just store the filename
       setFormData({
         ...formData,
-        sertifikat: file.name
+        sertifikat: file.name,
+        statusSertifikat: 'sudah_upload'
       })
     }
   }
@@ -97,9 +102,16 @@ export default function TrainingModal({ training, onSave, onClose }) {
           <h2 className="modal-title">
             {training ? 'Edit Data Pelatihan' : 'Tambah Data Pelatihan'}
           </h2>
-          <button className="btn-close" onClick={onClose}>
-            ✕
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            {user && (
+              <div style={{ fontSize: '12px', color: 'var(--text-medium)' }}>
+                NIP: {user.nip} - {user.nama}
+              </div>
+            )}
+            <button className="btn-close" onClick={onClose}>
+              ✕
+            </button>
+          </div>
         </div>
 
         <form onSubmit={handleSubmit}>
@@ -185,6 +197,9 @@ export default function TrainingModal({ training, onSave, onClose }) {
           <div className="form-group">
             <label htmlFor="sertifikat" className="form-label">
               Upload Sertifikat
+              <span className={`status-badge ${formData.statusSertifikat === 'sudah_upload' ? 'status-active' : 'status-inactive'}`} style={{ marginLeft: '10px', fontSize: '11px' }}>
+                {formData.statusSertifikat === 'sudah_upload' ? 'Sudah Upload' : 'Belum Upload'}
+              </span>
             </label>
             <div className="file-upload">
               <input
@@ -201,17 +216,20 @@ export default function TrainingModal({ training, onSave, onClose }) {
                     <>
                       📄 {formData.sertifikat}
                       <br />
-                      <small>Klik untuk mengganti file</small>
+                      <small style={{ color: 'var(--success)' }}>✓ File sudah dipilih - Klik untuk mengganti</small>
                     </>
                   ) : (
                     <>
                       📁 Klik untuk upload sertifikat
                       <br />
-                      <small>Format: PDF, JPG, PNG (Max 5MB)</small>
+                      <small>Format: PDF, JPG, PNG (Max 5MB) - Opsional</small>
                     </>
                   )}
                 </div>
               </label>
+            </div>
+            <div style={{ fontSize: '12px', color: 'var(--text-medium)', marginTop: '5px' }}>
+              <strong>Catatan:</strong> Upload sertifikat bersifat opsional, namun sangat direkomendasikan untuk kelengkapan data kompetensi Anda.
             </div>
           </div>
 

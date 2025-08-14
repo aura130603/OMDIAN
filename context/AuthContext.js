@@ -208,6 +208,73 @@ export const AuthProvider = ({ children }) => {
     return { success: false, message: 'Data tidak ditemukan' }
   }
 
+  const addUser = async (userData) => {
+    // Check if username or NIP already exists
+    const existingUser = DUMMY_USERS.find(u => u.username === userData.username || u.nip === userData.nip)
+    if (existingUser) {
+      return { success: false, message: 'Username atau NIP sudah digunakan' }
+    }
+
+    const newUser = {
+      id: Math.max(...DUMMY_USERS.map(u => u.id)) + 1,
+      role: 'pegawai',
+      ...userData
+    }
+
+    DUMMY_USERS.push(newUser)
+    return { success: true, message: 'Pegawai berhasil ditambahkan' }
+  }
+
+  const updateUser = async (userId, userData) => {
+    const index = DUMMY_USERS.findIndex(u => u.id === userId)
+    if (index === -1) {
+      return { success: false, message: 'Pegawai tidak ditemukan' }
+    }
+
+    // Check if username is being changed and already exists
+    if (userData.username && userData.username !== DUMMY_USERS[index].username) {
+      const existingUser = DUMMY_USERS.find(u => u.username === userData.username && u.id !== userId)
+      if (existingUser) {
+        return { success: false, message: 'Username sudah digunakan' }
+      }
+    }
+
+    // Update user data (don't change NIP or role)
+    const updatedData = { ...userData }
+    delete updatedData.nip // NIP cannot be changed
+    delete updatedData.role // Role cannot be changed by admin
+
+    DUMMY_USERS[index] = {
+      ...DUMMY_USERS[index],
+      ...updatedData
+    }
+
+    return { success: true, message: 'Data pegawai berhasil diperbarui' }
+  }
+
+  const deleteUser = async (userId) => {
+    // Don't allow deleting admin users
+    const userToDelete = DUMMY_USERS.find(u => u.id === userId)
+    if (userToDelete && userToDelete.role === 'admin') {
+      return { success: false, message: 'Admin tidak dapat dihapus' }
+    }
+
+    const index = DUMMY_USERS.findIndex(u => u.id === userId)
+    if (index === -1) {
+      return { success: false, message: 'Pegawai tidak ditemukan' }
+    }
+
+    // Also delete all training data for this user
+    for (let i = DUMMY_TRAINING_DATA.length - 1; i >= 0; i--) {
+      if (DUMMY_TRAINING_DATA[i].pegawaiId === userId) {
+        DUMMY_TRAINING_DATA.splice(i, 1)
+      }
+    }
+
+    DUMMY_USERS.splice(index, 1)
+    return { success: true, message: 'Pegawai berhasil dihapus' }
+  }
+
   const value = {
     user,
     loading,

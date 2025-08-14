@@ -414,6 +414,145 @@ a {
   font-size: 14px;
 }
 
+.profile-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.profile-button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.profile-button:hover {
+  background-color: var(--light-gray);
+  border-color: var(--primary-medium);
+}
+
+.profile-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: var(--primary-dark);
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.profile-info {
+  text-align: left;
+}
+
+.profile-name {
+  font-weight: 500;
+  color: var(--primary-darkest);
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+.profile-role {
+  font-size: 12px;
+  color: var(--text-medium);
+  line-height: 1.2;
+}
+
+.profile-arrow {
+  font-size: 10px;
+  color: var(--text-medium);
+  margin-left: 5px;
+}
+
+.profile-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(84, 71, 63, 0.15);
+  z-index: 1000;
+  min-width: 300px;
+  margin-top: 5px;
+}
+
+.profile-dropdown-header {
+  padding: 20px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary-medium) 100%);
+  border-radius: 10px 10px 0 0;
+}
+
+.profile-avatar-large {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: var(--primary-dark);
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 20px;
+}
+
+.profile-details h3 {
+  color: var(--primary-darkest);
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.profile-details p {
+  color: var(--text-medium);
+  font-size: 12px;
+  margin: 2px 0;
+}
+
+.profile-dropdown-body {
+  padding: 15px 20px;
+}
+
+.profile-dropdown-body .profile-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 13px;
+}
+
+.profile-dropdown-body .profile-item:last-child {
+  border-bottom: none;
+}
+
+.profile-dropdown-body .profile-label {
+  font-weight: 500;
+  color: var(--primary-darkest);
+}
+
+.profile-dropdown-body .profile-value {
+  color: var(--text-medium);
+  text-align: right;
+}
+
+.profile-dropdown-footer {
+  padding: 15px 20px;
+  border-top: 1px solid var(--border-color);
+}
+
 @media (max-width: 768px) {
   .auth-card {
     margin: 20px;

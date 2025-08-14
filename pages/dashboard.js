@@ -2,7 +2,7 @@ import { useContext, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { AuthContext } from '../context/AuthContext'
 import EmployeeDashboard from '../components/EmployeeDashboard'
-import AdminDashboard from '../components/AdminDashboard'
+import EnhancedAdminDashboard from '../components/EnhancedAdminDashboard'
 
 export default function Dashboard() {
   const { user, loading } = useContext(AuthContext)
@@ -39,7 +39,7 @@ export default function Dashboard() {
   return (
     <div className="dashboard-container">
       {user.role === 'admin' ? (
-        <AdminDashboard user={user} />
+        <EnhancedAdminDashboard user={user} />
       ) : (
         <EmployeeDashboard user={user} />
       )}

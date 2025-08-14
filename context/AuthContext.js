@@ -286,7 +286,10 @@ export const AuthProvider = ({ children }) => {
     getAllTrainingData,
     addTrainingData,
     updateTrainingData,
-    deleteTrainingData
+    deleteTrainingData,
+    addUser,
+    updateUser,
+    deleteUser
   }
 
   return (

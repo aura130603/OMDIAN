@@ -69,66 +69,6 @@ export default function EmployeeDashboard({ user }) {
 
       <div className="container">
         <div className="dashboard-content">
-          {/* Profile Card */}
-          <div className="card">
-            <div className="card-header">
-              <h2 className="card-title">Profil Pegawai</h2>
-            </div>
-            <div className="profile-grid">
-              <div className="profile-item">
-                <span className="profile-label">NIP</span>
-                <span className="profile-value">{user.nip}</span>
-              </div>
-              <div className="profile-item">
-                <span className="profile-label">Nama</span>
-                <span className="profile-value">{user.nama}</span>
-              </div>
-              <div className="profile-item">
-                <span className="profile-label">Pangkat</span>
-                <span className="profile-value">{user.pangkat}</span>
-              </div>
-              <div className="profile-item">
-                <span className="profile-label">Golongan/Ruang</span>
-                <span className="profile-value">{user.golongan}</span>
-              </div>
-              <div className="profile-item">
-                <span className="profile-label">Jabatan</span>
-                <span className="profile-value">{user.jabatan}</span>
-              </div>
-              <div className="profile-item">
-                <span className="profile-label">Pendidikan Terakhir</span>
-                <span className="profile-value">{user.pendidikan}</span>
-              </div>
-              <div className="profile-item">
-                <span className="profile-label">Nilai SKP Terakhir</span>
-                <span className="profile-value">{user.nilaiSKP || '-'}</span>
-              </div>
-              <div className="profile-item">
-                <span className="profile-label">Hukuman Disiplin</span>
-                <span className="profile-value">
-                  <span className={`status-badge ${user.hukumanDisiplin === 'Tidak Pernah' ? 'status-active' : 'status-inactive'}`}>
-                    {user.hukumanDisiplin}
-                  </span>
-                </span>
-              </div>
-              <div className="profile-item">
-                <span className="profile-label">Diklat PIM</span>
-                <span className="profile-value">
-                  <span className={`status-badge ${user.diklatPIM === 'Sudah' ? 'status-active' : 'status-inactive'}`}>
-                    {user.diklatPIM}
-                  </span>
-                </span>
-              </div>
-              <div className="profile-item">
-                <span className="profile-label">Diklat Fungsional</span>
-                <span className="profile-value">
-                  <span className={`status-badge ${user.diklatFungsional === 'Sudah' ? 'status-active' : 'status-inactive'}`}>
-                    {user.diklatFungsional}
-                  </span>
-                </span>
-              </div>
-            </div>
-          </div>
 
           {/* Training History Card */}
           <div className="card">

@@ -108,7 +108,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     try {
-      const response = await fetch(`/api/users?role=${user.role}`, {
+      const response = await fetch(`/api/users/dummy?role=${user.role}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

@@ -105,8 +105,21 @@ export default function Login() {
         </form>
 
         <div className="auth-footer">
-          Belum punya akun? 
+          Belum punya akun?
           <a href="/register" className="auth-link"> Daftar sekarang</a>
+        </div>
+
+        <div style={{
+          marginTop: '20px',
+          padding: '12px',
+          backgroundColor: 'rgba(203, 210, 164, 0.1)',
+          borderRadius: '8px',
+          fontSize: '11px',
+          color: 'var(--text-medium)',
+          textAlign: 'center',
+          border: '1px solid rgba(203, 210, 164, 0.2)'
+        }}>
+          <strong>Demo:</strong> admin1/admin123 atau pegawai1/password123
         </div>
 
       </div>

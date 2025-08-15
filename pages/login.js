@@ -109,7 +109,7 @@ export default function Login() {
           <a href="/register" className="auth-link"> Daftar sekarang</a>
         </div>
 
-        {/* <div className="demo-info" style={{
+        <div className="demo-info" style={{
           fontSize: '12px',
           color: 'var(--text-medium)',
           textAlign: 'center'
@@ -117,7 +117,7 @@ export default function Login() {
           <strong>Akun Demo Tersedia:</strong><br />
           <strong>Pegawai:</strong> pegawai1 / password123<br />
           <strong>Admin:</strong> admin1 / admin123
-        </div> */}
+        </div>
       </div>
     </div>
   )

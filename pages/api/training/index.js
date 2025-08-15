@@ -123,34 +123,23 @@ async function updateTrainingData(req, res) {
     })
   }
 
-  const query = `
-    UPDATE training_data 
-    SET tema = ?, penyelenggara = ?, tanggal_mulai = ?, tanggal_selesai = ?, keterangan = ?
-    WHERE id = ?
-  `
-
-  const result = await executeQuery(query, [
+  // Use dummy data (no database)
+  const result = updateFallbackTrainingData(id, {
     tema,
     penyelenggara,
-    tanggalMulai,
-    tanggalSelesai,
-    keterangan || null,
-    id
-  ])
+    tanggal_mulai: tanggalMulai,
+    tanggal_selesai: tanggalSelesai,
+    keterangan
+  })
 
   if (!result.success) {
-    return res.status(500).json({ 
-      success: false, 
-      message: 'Gagal memperbarui data pelatihan' 
+    return res.status(404).json({
+      success: false,
+      message: result.message
     })
   }
 
-  if (result.data.affectedRows === 0) {
-    return res.status(404).json({ 
-      success: false, 
-      message: 'Data pelatihan tidak ditemukan' 
-    })
-  }
+  console.log('✅ Training data updated with dummy data')
 
   res.status(200).json({
     success: true,
@@ -169,22 +158,17 @@ async function deleteTrainingData(req, res) {
     })
   }
 
-  const query = 'DELETE FROM training_data WHERE id = ?'
-  const result = await executeQuery(query, [id])
+  // Use dummy data (no database)
+  const result = deleteFallbackTrainingData(id)
 
   if (!result.success) {
-    return res.status(500).json({ 
-      success: false, 
-      message: 'Gagal menghapus data pelatihan' 
+    return res.status(404).json({
+      success: false,
+      message: result.message
     })
   }
 
-  if (result.data.affectedRows === 0) {
-    return res.status(404).json({ 
-      success: false, 
-      message: 'Data pelatihan tidak ditemukan' 
-    })
-  }
+  console.log('✅ Training data deleted with dummy data')
 
   res.status(200).json({
     success: true,

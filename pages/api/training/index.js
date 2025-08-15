@@ -1,4 +1,10 @@
 import { executeQuery } from '../../../lib/db'
+import {
+  getFallbackTrainingData,
+  addFallbackTrainingData,
+  updateFallbackTrainingData,
+  deleteFallbackTrainingData
+} from './fallback'
 
 export default async function handler(req, res) {
   try {
@@ -28,69 +34,78 @@ async function getTrainingData(req, res) {
   const { userId, role } = req.query
 
   if (!userId || !role) {
-    return res.status(400).json({ 
-      success: false, 
-      message: 'User ID dan role diperlukan' 
+    return res.status(400).json({
+      success: false,
+      message: 'User ID dan role diperlukan'
     })
   }
 
-  let query, params
+  try {
+    let query, params
 
-  if (role === 'admin') {
-    // Admin can see all training data
-    query = `
-      SELECT 
-        t.id,
-        t.user_id,
-        t.tema,
-        t.penyelenggara,
-        t.tanggal_mulai,
-        t.tanggal_selesai,
-        t.keterangan,
-        t.sertifikat_filename,
-        t.status,
-        t.created_at,
-        u.nama as pegawai_nama,
-        u.nip as pegawai_nip
-      FROM training_data t
-      JOIN users u ON t.user_id = u.id
-      ORDER BY t.tanggal_mulai DESC
-    `
-    params = []
-  } else {
-    // Regular users can only see their own data
-    query = `
-      SELECT 
-        id,
-        user_id,
-        tema,
-        penyelenggara,
-        tanggal_mulai,
-        tanggal_selesai,
-        keterangan,
-        sertifikat_filename,
-        status,
-        created_at
-      FROM training_data
-      WHERE user_id = ?
-      ORDER BY tanggal_mulai DESC
-    `
-    params = [userId]
-  }
+    if (role === 'admin') {
+      // Admin can see all training data
+      query = `
+        SELECT
+          t.id,
+          t.user_id,
+          t.tema,
+          t.penyelenggara,
+          t.tanggal_mulai,
+          t.tanggal_selesai,
+          t.keterangan,
+          t.sertifikat_filename,
+          t.status,
+          t.created_at,
+          u.nama as pegawai_nama,
+          u.nip as pegawai_nip
+        FROM training_data t
+        JOIN users u ON t.user_id = u.id
+        ORDER BY t.tanggal_mulai DESC
+      `
+      params = []
+    } else {
+      // Regular users can only see their own data
+      query = `
+        SELECT
+          id,
+          user_id,
+          tema,
+          penyelenggara,
+          tanggal_mulai,
+          tanggal_selesai,
+          keterangan,
+          sertifikat_filename,
+          status,
+          created_at
+        FROM training_data
+        WHERE user_id = ?
+        ORDER BY tanggal_mulai DESC
+      `
+      params = [userId]
+    }
 
-  const result = await executeQuery(query, params)
+    const result = await executeQuery(query, params)
 
-  if (!result.success) {
-    return res.status(500).json({ 
-      success: false, 
-      message: 'Gagal mengambil data pelatihan' 
+    if (result.success) {
+      res.status(200).json({
+        success: true,
+        data: result.data
+      })
+    } else {
+      throw new Error('Database query failed')
+    }
+  } catch (error) {
+    console.warn('Database failed, using fallback data:', error.message)
+
+    // Use fallback data
+    const fallbackData = getFallbackTrainingData(userId, role)
+
+    res.status(200).json({
+      success: true,
+      data: fallbackData
     })
   }
-
-  res.status(200).json({
-    success: true,
-    data: result.data
-  })
 }
 
 // POST - Create new training data

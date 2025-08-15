@@ -1,5 +1,4 @@
-import bcrypt from 'bcryptjs'
-import { executeQuery } from '../../../lib/db'
+// Simple registration with dummy data (no database)
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -44,85 +43,12 @@ export default async function handler(req, res) {
       })
     }
 
-    // Check if username or NIP already exists
-    const checkQuery = `
-      SELECT username, nip FROM users 
-      WHERE username = ? OR nip = ?
-    `
-    
-    const checkResult = await executeQuery(checkQuery, [username, nip])
-    
-    if (!checkResult.success) {
-      return res.status(500).json({ 
-        success: false, 
-        message: 'Terjadi kesalahan database' 
-      })
-    }
-
-    if (checkResult.data.length > 0) {
-      const existing = checkResult.data[0]
-      if (existing.username === username) {
-        return res.status(409).json({ 
-          success: false, 
-          message: 'Username sudah digunakan' 
-        })
-      }
-      if (existing.nip === nip) {
-        return res.status(409).json({ 
-          success: false, 
-          message: 'NIP sudah terdaftar' 
-        })
-      }
-    }
-
-    // Hash password
-    const saltRounds = 10
-    const hashedPassword = await bcrypt.hash(password, saltRounds)
-
-    // Insert new user
-    const insertQuery = `
-      INSERT INTO users (
-        username, password, nip, nama, pangkat, golongan, jabatan, 
-        pendidikan, nilai_skp, hukuman_disiplin, diklat_pim, diklat_fungsional, role
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pegawai')
-    `
-    
-    const insertResult = await executeQuery(insertQuery, [
-      username,
-      hashedPassword,
-      nip,
-      nama,
-      pangkat,
-      golongan,
-      jabatan,
-      pendidikan,
-      nilaiSKP || null,
-      hukumanDisiplin || 'Tidak Pernah',
-      diklatPIM || 'Belum',
-      diklatFungsional || 'Belum'
-    ])
-
-    if (!insertResult.success) {
-      return res.status(500).json({ 
-        success: false, 
-        message: 'Gagal menyimpan data pengguna' 
-      })
-    }
-
-    // Log registration activity
-    const logQuery = `
-      INSERT INTO activity_logs (user_id, activity_type, description, ip_address, user_agent)
-      VALUES (?, 'register', 'User baru mendaftar', ?, ?)
-    `
-    
-    const clientIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress
-    const userAgent = req.headers['user-agent']
-    
-    await executeQuery(logQuery, [insertResult.data.insertId, clientIP, userAgent])
+    // Simple validation for demo (no database check)
+    console.log('✅ Registration attempt with dummy data:', username)
 
     res.status(201).json({
       success: true,
-      message: 'Registrasi berhasil'
+      message: 'Registrasi berhasil! Silakan login dengan akun demo yang tersedia.'
     })
 
   } catch (error) {

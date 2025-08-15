@@ -68,48 +68,67 @@ export default async function handler(req, res) {
       })
     }
 
-    // Get user from database
-    const userQuery = `
-      SELECT id, username, password, nip, nama, pangkat, golongan, jabatan, 
-             pendidikan, nilai_skp, hukuman_disiplin, diklat_pim, diklat_fungsional, role, status
-      FROM users 
-      WHERE username = ? AND status = 'aktif'
-    `
-    
-    const userResult = await executeQuery(userQuery, [username])
-    
-    if (!userResult.success || userResult.data.length === 0) {
-      return res.status(401).json({ 
-        success: false, 
-        message: 'Username atau password salah' 
-      })
+    let user = null
+    let isDatabaseMode = true
+
+    try {
+      // Try database authentication first
+      const userQuery = `
+        SELECT id, username, password, nip, nama, pangkat, golongan, jabatan,
+               pendidikan, nilai_skp, hukuman_disiplin, diklat_pim, diklat_fungsional, role, status
+        FROM users
+        WHERE username = ? AND status = 'aktif'
+      `
+
+      const userResult = await executeQuery(userQuery, [username])
+
+      if (userResult.success && userResult.data.length > 0) {
+        const dbUser = userResult.data[0]
+        const isValidPassword = await bcrypt.compare(password, dbUser.password)
+
+        if (isValidPassword) {
+          user = dbUser
+        }
+      }
+    } catch (dbError) {
+      console.warn('Database authentication failed, falling back to dummy data:', dbError.message)
+      isDatabaseMode = false
     }
 
-    const user = userResult.data[0]
+    // Fallback to dummy data if database is not available
+    if (!user && !isDatabaseMode) {
+      const dummyUser = DUMMY_USERS.find(u => u.username === username && u.password === password)
+      if (dummyUser) {
+        user = dummyUser
+      }
+    }
 
-    // Verify password
-    const isValidPassword = await bcrypt.compare(password, user.password)
-    
-    if (!isValidPassword) {
-      return res.status(401).json({ 
-        success: false, 
-        message: 'Username atau password salah' 
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Username atau password salah'
       })
     }
 
     // Remove password from response
     const { password: _, ...userWithoutPassword } = user
 
-    // Log login activity
-    const logQuery = `
-      INSERT INTO activity_logs (user_id, activity_type, description, ip_address, user_agent)
-      VALUES (?, 'login', 'User berhasil login', ?, ?)
-    `
-    
-    const clientIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress
-    const userAgent = req.headers['user-agent']
-    
-    await executeQuery(logQuery, [user.id, clientIP, userAgent])
+    // Log login activity (only if database is available)
+    if (isDatabaseMode) {
+      try {
+        const logQuery = `
+          INSERT INTO activity_logs (user_id, activity_type, description, ip_address, user_agent)
+          VALUES (?, 'login', 'User berhasil login', ?, ?)
+        `
+
+        const clientIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress
+        const userAgent = req.headers['user-agent']
+
+        await executeQuery(logQuery, [user.id, clientIP, userAgent])
+      } catch (logError) {
+        console.warn('Failed to log activity:', logError.message)
+      }
+    }
 
     res.status(200).json({
       success: true,

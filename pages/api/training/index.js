@@ -40,72 +40,15 @@ async function getTrainingData(req, res) {
     })
   }
 
-  try {
-    let query, params
+  // Use dummy data only (no database connection)
+  const fallbackData = getFallbackTrainingData(userId, role)
 
-    if (role === 'admin') {
-      // Admin can see all training data
-      query = `
-        SELECT
-          t.id,
-          t.user_id,
-          t.tema,
-          t.penyelenggara,
-          t.tanggal_mulai,
-          t.tanggal_selesai,
-          t.keterangan,
-          t.sertifikat_filename,
-          t.status,
-          t.created_at,
-          u.nama as pegawai_nama,
-          u.nip as pegawai_nip
-        FROM training_data t
-        JOIN users u ON t.user_id = u.id
-        ORDER BY t.tanggal_mulai DESC
-      `
-      params = []
-    } else {
-      // Regular users can only see their own data
-      query = `
-        SELECT
-          id,
-          user_id,
-          tema,
-          penyelenggara,
-          tanggal_mulai,
-          tanggal_selesai,
-          keterangan,
-          sertifikat_filename,
-          status,
-          created_at
-        FROM training_data
-        WHERE user_id = ?
-        ORDER BY tanggal_mulai DESC
-      `
-      params = [userId]
-    }
+  console.log('✅ Training data retrieved with dummy data')
 
-    const result = await executeQuery(query, params)
-
-    if (result.success) {
-      res.status(200).json({
-        success: true,
-        data: result.data
-      })
-    } else {
-      throw new Error('Database query failed')
-    }
-  } catch (error) {
-    console.warn('Database failed, using fallback data:', error.message)
-
-    // Use fallback data
-    const fallbackData = getFallbackTrainingData(userId, role)
-
-    res.status(200).json({
-      success: true,
-      data: fallbackData
-    })
-  }
+  res.status(200).json({
+    success: true,
+    data: fallbackData
+  })
 }
 
 // POST - Create new training data
@@ -135,43 +78,22 @@ async function createTrainingData(req, res) {
     })
   }
 
-  const query = `
-    INSERT INTO training_data (
-      user_id, tema, penyelenggara, tanggal_mulai, tanggal_selesai, keterangan
-    ) VALUES (?, ?, ?, ?, ?, ?)
-  `
-
-  const result = await executeQuery(query, [
-    userId,
+  // Use dummy data (no database)
+  const result = addFallbackTrainingData({
+    user_id: userId,
     tema,
     penyelenggara,
-    tanggalMulai,
-    tanggalSelesai,
-    keterangan || null
-  ])
+    tanggal_mulai: tanggalMulai,
+    tanggal_selesai: tanggalSelesai,
+    keterangan
+  })
 
-  if (!result.success) {
-    return res.status(500).json({ 
-      success: false, 
-      message: 'Gagal menyimpan data pelatihan' 
-    })
-  }
-
-  // Log activity
-  const logQuery = `
-    INSERT INTO activity_logs (user_id, activity_type, description)
-    VALUES (?, 'training_add', ?)
-  `
-  
-  await executeQuery(logQuery, [
-    userId,
-    `Menambah data pelatihan: ${tema}`
-  ])
+  console.log('✅ Training data added with dummy data')
 
   res.status(201).json({
     success: true,
     message: 'Data pelatihan berhasil ditambahkan',
-    data: { id: result.data.insertId }
+    data: result.data
   })
 }
 

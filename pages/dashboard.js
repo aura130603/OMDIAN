@@ -1,8 +1,7 @@
 import { useContext, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { AuthContext } from '../context/AuthContext'
-import EmployeeDashboard from '../components/EmployeeDashboard'
-import EnhancedAdminDashboard from '../components/EnhancedAdminDashboard'
+import ProfileDropdown from '../components/ProfileDropdown'
 
 export default function Dashboard() {
   const { user, loading } = useContext(AuthContext)
@@ -36,13 +35,129 @@ export default function Dashboard() {
     return null
   }
 
+  const handleCardClick = (path) => {
+    router.push(path)
+  }
+
   return (
     <div className="dashboard-container">
-      {user.role === 'admin' ? (
-        <EnhancedAdminDashboard user={user} />
-      ) : (
-        <EmployeeDashboard user={user} />
-      )}
+      <div className="dashboard-header">
+        <div className="container">
+          <div className="dashboard-nav">
+            <h1 className="dashboard-title">OMDIAN - Dashboard Utama</h1>
+            <div className="dashboard-user">
+              <ProfileDropdown user={user} />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="container">
+        <div className="main-dashboard-content">
+          <div className="welcome-section">
+            <h2 className="welcome-title">
+              Selamat Datang, {user.nama}
+            </h2>
+            <p className="welcome-subtitle">
+              {user.role === 'admin' 
+                ? 'Kelola data pengembangan kompetensi pegawai dengan mudah' 
+                : 'Kelola riwayat pengembangan kompetensi Anda'}
+            </p>
+          </div>
+
+          <div className="dashboard-cards">
+            <div 
+              className="dashboard-card training-card"
+              onClick={() => handleCardClick('/training-history')}
+            >
+              <div className="card-icon">
+                📚
+              </div>
+              <div className="card-content">
+                <h3 className="card-title">Riwayat Diklat/Workshop/Seminar</h3>
+                <p className="card-description">
+                  {user.role === 'admin' 
+                    ? 'Kelola dan pantau riwayat pelatihan semua pegawai' 
+                    : 'Lihat dan kelola riwayat pelatihan Anda'}
+                </p>
+              </div>
+              <div className="card-arrow">
+                →
+              </div>
+            </div>
+
+            <div 
+              className="dashboard-card statistics-card"
+              onClick={() => handleCardClick('/statistics')}
+            >
+              <div className="card-icon">
+                📊
+              </div>
+              <div className="card-content">
+                <h3 className="card-title">Statistik Pengembangan Kompetensi</h3>
+                <p className="card-description">
+                  {user.role === 'admin' 
+                    ? 'Analisis dan laporan komprehensif pengembangan kompetensi' 
+                    : 'Lihat statistik dan progress pengembangan kompetensi Anda'}
+                </p>
+              </div>
+              <div className="card-arrow">
+                →
+              </div>
+            </div>
+
+            {user.role === 'admin' && (
+              <div 
+                className="dashboard-card management-card"
+                onClick={() => handleCardClick('/employee-management')}
+              >
+                <div className="card-icon">
+                  👥
+                </div>
+                <div className="card-content">
+                  <h3 className="card-title">Kelola Data Pegawai</h3>
+                  <p className="card-description">
+                    Tambah, edit, dan kelola data pegawai serta monitoring kelengkapan data
+                  </p>
+                </div>
+                <div className="card-arrow">
+                  →
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="quick-stats">
+            <h3 className="stats-title">Ringkasan Cepat</h3>
+            <div className="stats-grid">
+              <div className="stat-item">
+                <div className="stat-number">
+                  {user.role === 'admin' ? '12' : '5'}
+                </div>
+                <div className="stat-label">
+                  {user.role === 'admin' ? 'Total Pegawai' : 'Pelatihan Tahun Ini'}
+                </div>
+              </div>
+              <div className="stat-item">
+                <div className="stat-number">
+                  {user.role === 'admin' ? '45' : '15'}
+                </div>
+                <div className="stat-label">
+                  {user.role === 'admin' ? 'Total Pelatihan' : 'Total Pelatihan'}
+                </div>
+              </div>
+              <div className="stat-item">
+                <div className="stat-number">
+                  {user.role === 'admin' ? '85%' : '100%'}
+                </div>
+                <div className="stat-label">
+                  {user.role === 'admin' ? 'Tingkat Kelengkapan' : 'Progress Sertifikat'}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

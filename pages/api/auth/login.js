@@ -68,42 +68,10 @@ export default async function handler(req, res) {
       })
     }
 
-    let user = null
-    let isDatabaseMode = true
+    // Use dummy data authentication (no database connection)
+    const dummyUser = DUMMY_USERS.find(u => u.username === username && u.password === password)
 
-    try {
-      // Try database authentication first
-      const userQuery = `
-        SELECT id, username, password, nip, nama, pangkat, golongan, jabatan,
-               pendidikan, nilai_skp, hukuman_disiplin, diklat_pim, diklat_fungsional, role, status
-        FROM users
-        WHERE username = ? AND status = 'aktif'
-      `
-
-      const userResult = await executeQuery(userQuery, [username])
-
-      if (userResult.success && userResult.data.length > 0) {
-        const dbUser = userResult.data[0]
-        const isValidPassword = await bcrypt.compare(password, dbUser.password)
-
-        if (isValidPassword) {
-          user = dbUser
-        }
-      }
-    } catch (dbError) {
-      console.warn('Database authentication failed, falling back to dummy data:', dbError.message)
-      isDatabaseMode = false
-    }
-
-    // Fallback to dummy data if database is not available
-    if (!user && !isDatabaseMode) {
-      const dummyUser = DUMMY_USERS.find(u => u.username === username && u.password === password)
-      if (dummyUser) {
-        user = dummyUser
-      }
-    }
-
-    if (!user) {
+    if (!dummyUser) {
       return res.status(401).json({
         success: false,
         message: 'Username atau password salah'
@@ -111,24 +79,9 @@ export default async function handler(req, res) {
     }
 
     // Remove password from response
-    const { password: _, ...userWithoutPassword } = user
+    const { password: _, ...userWithoutPassword } = dummyUser
 
-    // Log login activity (only if database is available)
-    if (isDatabaseMode) {
-      try {
-        const logQuery = `
-          INSERT INTO activity_logs (user_id, activity_type, description, ip_address, user_agent)
-          VALUES (?, 'login', 'User berhasil login', ?, ?)
-        `
-
-        const clientIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress
-        const userAgent = req.headers['user-agent']
-
-        await executeQuery(logQuery, [user.id, clientIP, userAgent])
-      } catch (logError) {
-        console.warn('Failed to log activity:', logError.message)
-      }
-    }
+    console.log('✅ Login successful with dummy data:', userWithoutPassword.username)
 
     res.status(200).json({
       success: true,

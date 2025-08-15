@@ -31,6 +31,27 @@ export const AuthProvider = ({ children }) => {
         body: JSON.stringify({ username, password }),
       })
 
+      // Check if response is ok before trying to parse JSON
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error('Response not ok:', response.status, errorText)
+        return {
+          success: false,
+          message: `Server error: ${response.status}`
+        }
+      }
+
+      // Check if response has content before parsing JSON
+      const contentType = response.headers.get('content-type')
+      if (!contentType || !contentType.includes('application/json')) {
+        const responseText = await response.text()
+        console.error('Non-JSON response:', responseText)
+        return {
+          success: false,
+          message: 'Server mengembalikan respons yang tidak valid'
+        }
+      }
+
       const data = await response.json()
 
       if (data.success) {
@@ -40,10 +61,18 @@ export const AuthProvider = ({ children }) => {
         }
         return { success: true }
       } else {
-        return { success: false, message: data.message }
+        return { success: false, message: data.message || 'Login gagal' }
       }
     } catch (error) {
       console.error('Login error:', error)
+      // If it's a network error
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        return { success: false, message: 'Tidak dapat terhubung ke server' }
+      }
+      // If it's a JSON parsing error
+      if (error.name === 'SyntaxError') {
+        return { success: false, message: 'Server mengembalikan data yang tidak valid' }
+      }
       return { success: false, message: 'Terjadi kesalahan koneksi' }
     }
   }

@@ -99,11 +99,29 @@ export default function handler(req, res) {
       })
     }
 
+    const mappedUsers = DUMMY_USERS.map(user => ({
+      id: user.id,
+      username: user.username,
+      nip: user.nip,
+      nama: user.nama,
+      pangkat: user.pangkat,
+      golongan: user.golongan,
+      jabatan: user.jabatan,
+      pendidikan: user.pendidikan,
+      nilaiSKP: user.nilai_skp,
+      hukumanDisiplin: user.hukuman_disiplin,
+      diklatPim: user.diklat_pim,
+      diklatFungsional: user.diklat_fungsional,
+      role: user.role,
+      status: user.status,
+      createdAt: user.created_at
+    }))
+
     console.log('✅ Users data retrieved with dummy data')
-    
+
     res.status(200).json({
       success: true,
-      data: DUMMY_USERS
+      data: mappedUsers
     })
   } else {
     res.status(405).json({ message: 'Method not allowed' })

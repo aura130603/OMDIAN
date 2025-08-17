@@ -1,17 +1,69 @@
-import { useContext, useEffect } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { AuthContext } from '../context/AuthContext'
 import ProfileDropdown from '../components/ProfileDropdown'
 
 export default function Dashboard() {
-  const { user, loading } = useContext(AuthContext)
+  const { user, loading, getAllUsers, getAllTrainingData, getUserTrainingData } = useContext(AuthContext)
   const router = useRouter()
+  const [quickStats, setQuickStats] = useState({
+    totalEmployees: 0,
+    totalTraining: 0,
+    thisYearTraining: 0,
+    completionRate: 0
+  })
 
   useEffect(() => {
     if (!loading && !user) {
       router.push('/login')
     }
   }, [user, loading, router])
+
+  useEffect(() => {
+    if (user) {
+      const loadQuickStats = async () => {
+        try {
+          const currentYear = new Date().getFullYear()
+
+          if (user.role === 'admin') {
+            const users = await getAllUsers()
+            const training = await getAllTrainingData()
+            const thisYearTraining = training.filter(t => {
+              const year = new Date(t.tanggalMulai).getFullYear()
+              return year === currentYear
+            })
+            const employeesWithTraining = new Set(thisYearTraining.map(t => t.pegawaiId)).size
+            const completionRate = users.length > 0 ? Math.round((employeesWithTraining / users.length) * 100) : 0
+
+            setQuickStats({
+              totalEmployees: users.length,
+              totalTraining: training.length,
+              thisYearTraining: thisYearTraining.length,
+              completionRate: completionRate
+            })
+          } else {
+            const training = await getUserTrainingData(user.id)
+            const thisYearTraining = training.filter(t => {
+              const year = new Date(t.tanggalMulai).getFullYear()
+              return year === currentYear
+            })
+            const certificateCount = training.filter(t => t.sertifikat).length
+            const certificateRate = training.length > 0 ? Math.round((certificateCount / training.length) * 100) : 0
+
+            setQuickStats({
+              totalEmployees: 0, // Not relevant for employee
+              totalTraining: training.length,
+              thisYearTraining: thisYearTraining.length,
+              completionRate: certificateRate // For employee, this represents certificate completion rate
+            })
+          }
+        } catch (error) {
+          console.error('Error loading quick stats:', error)
+        }
+      }
+      loadQuickStats()
+    }
+  }, [user, getAllUsers, getAllTrainingData, getUserTrainingData])
 
   if (loading) {
     return (
@@ -132,7 +184,7 @@ export default function Dashboard() {
             <div className="stats-grid">
               <div className="stat-item">
                 <div className="stat-number">
-                  {user.role === 'admin' ? '12' : '5'}
+                  {user.role === 'admin' ? quickStats.totalEmployees : quickStats.thisYearTraining}
                 </div>
                 <div className="stat-label">
                   {user.role === 'admin' ? 'Total Pegawai' : 'Pelatihan Tahun Ini'}
@@ -140,7 +192,7 @@ export default function Dashboard() {
               </div>
               <div className="stat-item">
                 <div className="stat-number">
-                  {user.role === 'admin' ? '45' : '15'}
+                  {user.role === 'admin' ? quickStats.totalTraining : quickStats.totalTraining}
                 </div>
                 <div className="stat-label">
                   {user.role === 'admin' ? 'Total Pelatihan' : 'Total Pelatihan'}
@@ -148,7 +200,7 @@ export default function Dashboard() {
               </div>
               <div className="stat-item">
                 <div className="stat-number">
-                  {user.role === 'admin' ? '85%' : '100%'}
+                  {quickStats.completionRate}%
                 </div>
                 <div className="stat-label">
                   {user.role === 'admin' ? 'Tingkat Kelengkapan' : 'Progress Sertifikat'}

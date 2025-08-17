@@ -3,6 +3,7 @@ import { useRouter } from 'next/router'
 import { AuthContext } from '../context/AuthContext'
 import ProfileDropdown from '../components/ProfileDropdown'
 import TrainingModal from '../components/TrainingModal'
+import { viewCertificate } from '../utils/exportUtils'
 
 export default function TrainingHistory() {
   const { user, loading, getUserTrainingData, getAllTrainingData, addTrainingData, updateTrainingData, deleteTrainingData } = useContext(AuthContext)
@@ -246,13 +247,14 @@ export default function TrainingHistory() {
                         </td>
                         <td>
                           {training.sertifikat ? (
-                            <a 
-                              href="#" 
-                              className="auth-link"
+                            <button
+                              className="btn btn-small btn-secondary"
+                              onClick={() => viewCertificate(training.sertifikat)}
                               title="Lihat Sertifikat"
+                              style={{ fontSize: '11px', padding: '4px 8px' }}
                             >
                               📄 Lihat
-                            </a>
+                            </button>
                           ) : (
                             <span style={{ color: 'var(--text-medium)' }}>
                               Belum upload

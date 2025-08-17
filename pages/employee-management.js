@@ -26,10 +26,19 @@ export default function EmployeeManagement() {
 
   useEffect(() => {
     if (user && user.role === 'admin') {
-      const users = getAllUsers()
-      const training = getAllTrainingData()
-      setAllUsers(users)
-      setAllTraining(training)
+      const loadEmployeeData = async () => {
+        try {
+          const users = await getAllUsers()
+          const training = await getAllTrainingData()
+          setAllUsers(users)
+          setAllTraining(training)
+        } catch (error) {
+          console.error('Error loading employee data:', error)
+          setAllUsers([])
+          setAllTraining([])
+        }
+      }
+      loadEmployeeData()
     }
   }, [user, getAllUsers, getAllTrainingData])
 
@@ -47,8 +56,8 @@ export default function EmployeeManagement() {
     if (window.confirm('Apakah Anda yakin ingin menghapus data pegawai ini?')) {
       const result = await deleteUser(employeeId)
       if (result.success) {
-        const updatedUsers = getAllUsers()
-        const updatedTraining = getAllTrainingData()
+        const updatedUsers = await getAllUsers()
+        const updatedTraining = await getAllTrainingData()
         setAllUsers(updatedUsers)
         setAllTraining(updatedTraining)
       } else {
@@ -61,7 +70,7 @@ export default function EmployeeManagement() {
     if (editingEmployee) {
       const result = await updateUser(editingEmployee.id, employeeData)
       if (result.success) {
-        const updatedUsers = getAllUsers()
+        const updatedUsers = await getAllUsers()
         setAllUsers(updatedUsers)
         setShowModal(false)
       } else {
@@ -70,7 +79,7 @@ export default function EmployeeManagement() {
     } else {
       const result = await addUser(employeeData)
       if (result.success) {
-        const updatedUsers = getAllUsers()
+        const updatedUsers = await getAllUsers()
         setAllUsers(updatedUsers)
         setShowModal(false)
       } else {

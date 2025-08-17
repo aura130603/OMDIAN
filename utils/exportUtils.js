@@ -1,6 +1,6 @@
 // Export utility functions for generating reports
 
-export const exportToCSV = (data, filename) => {
+export const exportToExcel = (data, filename, sheetName = 'Data') => {
   try {
     if (!data || data.length === 0) {
       alert('Tidak ada data untuk diekspor')
@@ -9,35 +9,57 @@ export const exportToCSV = (data, filename) => {
 
     // Get headers from first object
     const headers = Object.keys(data[0])
-    
-    // Convert data to CSV format
-    const csvContent = [
-      headers.join(','), // Header row
-      ...data.map(row => 
-        headers.map(header => {
-          const value = row[header] || ''
-          // Escape quotes and wrap in quotes if contains comma
-          return typeof value === 'string' && (value.includes(',') || value.includes('"')) 
-            ? `"${value.replace(/"/g, '""')}"` 
-            : value
-        }).join(',')
-      )
-    ].join('\n')
 
-    // Create and download file
-    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' })
+    // Create worksheet data with headers and rows
+    const worksheetData = [
+      headers, // Header row
+      ...data.map(row => headers.map(header => row[header] || ''))
+    ]
+
+    // Convert to HTML table format for Excel
+    const htmlTable = `
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <style>
+            table { border-collapse: collapse; width: 100%; }
+            th, td { border: 1px solid #000; padding: 8px; text-align: left; }
+            th { background-color: #f2f2f2; font-weight: bold; }
+          </style>
+        </head>
+        <body>
+          <table>
+            <thead>
+              <tr>
+                ${headers.map(header => `<th>${header}</th>`).join('')}
+              </tr>
+            </thead>
+            <tbody>
+              ${data.map(row =>
+                `<tr>${headers.map(header => `<td>${row[header] || ''}</td>`).join('')}</tr>`
+              ).join('')}
+            </tbody>
+          </table>
+        </body>
+      </html>
+    `
+
+    // Create and download file as Excel
+    const blob = new Blob([htmlTable], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    })
     const link = document.createElement('a')
     const url = URL.createObjectURL(blob)
     link.setAttribute('href', url)
-    link.setAttribute('download', `${filename}.csv`)
+    link.setAttribute('download', `${filename}.xls`)
     link.style.visibility = 'hidden'
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
-    
+
     return true
   } catch (error) {
-    console.error('Error exporting CSV:', error)
+    console.error('Error exporting Excel:', error)
     alert('Terjadi kesalahan saat mengekspor data')
     return false
   }
@@ -70,7 +92,7 @@ export const exportEmployeeReport = (employees, trainingData) => {
     }
   })
 
-  return exportToCSV(reportData, `Laporan_Pegawai_OMDIAN_${currentYear}`)
+  return exportToExcel(reportData, `Laporan_Pegawai_OMDIAN_${currentYear}`, 'Data Pegawai')
 }
 
 export const exportTrainingReport = (trainingData) => {
@@ -87,7 +109,7 @@ export const exportTrainingReport = (trainingData) => {
     'Tahun Pelaksanaan': new Date(training.tanggalMulai).getFullYear()
   }))
 
-  return exportToCSV(reportData, `Laporan_Pelatihan_OMDIAN_${new Date().getFullYear()}`)
+  return exportToExcel(reportData, `Laporan_Pelatihan_OMDIAN_${new Date().getFullYear()}`, 'Data Pelatihan')
 }
 
 export const exportMonitoringReport = (employees, trainingData) => {
@@ -122,7 +144,7 @@ export const exportMonitoringReport = (employees, trainingData) => {
     }
   })
 
-  return exportToCSV(monitoringData, `Monitoring_Kompetensi_${currentYear}`)
+  return exportToExcel(monitoringData, `Monitoring_Kompetensi_${currentYear}`, 'Monitoring')
 }
 
 // Helper functions
@@ -145,10 +167,19 @@ const calculateDuration = (startDate, endDate) => {
   return diffDays
 }
 
-// PDF Export functionality (simplified - in production you'd use libraries like jsPDF)
-export const exportToPDF = (title, data) => {
-  // For now, show alert - in production, integrate with jsPDF
-  alert(`Fitur PDF Export untuk "${title}" akan segera tersedia. Sementara ini gunakan CSV Export yang sudah berfungsi.`)
+// Certificate viewing functionality
+export const viewCertificate = (certificateFilename) => {
+  if (!certificateFilename) {
+    alert('Sertifikat tidak tersedia')
+    return
+  }
+
+  // In a real application, this would open the actual certificate file
+  // For demo purposes, we'll show a modal or alert
+  alert(`Menampilkan sertifikat: ${certificateFilename}\n\nCatatan: Dalam implementasi nyata, ini akan membuka file sertifikat yang telah diupload.`)
+
+  // Real implementation would be something like:
+  // window.open(`/api/certificates/${certificateFilename}`, '_blank')
 }
 
 // Generate summary statistics for reports

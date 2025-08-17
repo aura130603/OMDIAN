@@ -24,15 +24,25 @@ export default function Statistics() {
 
   useEffect(() => {
     if (user) {
-      if (user.role === 'admin') {
-        const users = getAllUsers()
-        const training = getAllTrainingData()
-        setAllUsers(users)
-        setAllTraining(training)
-      } else {
-        const training = getUserTrainingData(user.id)
-        setUserTraining(training)
+      const loadStatisticsData = async () => {
+        try {
+          if (user.role === 'admin') {
+            const users = await getAllUsers()
+            const training = await getAllTrainingData()
+            setAllUsers(users)
+            setAllTraining(training)
+          } else {
+            const training = await getUserTrainingData(user.id)
+            setUserTraining(training)
+          }
+        } catch (error) {
+          console.error('Error loading statistics data:', error)
+          setAllUsers([])
+          setAllTraining([])
+          setUserTraining([])
+        }
       }
+      loadStatisticsData()
     }
   }, [user, getAllUsers, getAllTrainingData, getUserTrainingData])
 

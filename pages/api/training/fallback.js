@@ -59,10 +59,27 @@ const DUMMY_TRAINING_DATA = [
 ]
 
 export function getFallbackTrainingData(userId, role) {
+  const mapTrainingData = (training) => ({
+    id: training.id,
+    pegawaiId: training.user_id,
+    pegawaiNama: training.pegawai_nama,
+    pegawaiNIP: training.pegawai_nip,
+    tema: training.tema,
+    penyelenggara: training.penyelenggara,
+    tanggalMulai: training.tanggal_mulai,
+    tanggalSelesai: training.tanggal_selesai,
+    keterangan: training.keterangan,
+    sertifikat: training.sertifikat_filename,
+    status: training.status,
+    createdAt: training.created_at
+  })
+
   if (role === 'admin') {
-    return DUMMY_TRAINING_DATA
+    return DUMMY_TRAINING_DATA.map(mapTrainingData)
   } else {
-    return DUMMY_TRAINING_DATA.filter(training => training.user_id === parseInt(userId))
+    return DUMMY_TRAINING_DATA
+      .filter(training => training.user_id === parseInt(userId))
+      .map(mapTrainingData)
   }
 }
 
@@ -70,7 +87,13 @@ export function addFallbackTrainingData(trainingData) {
   const newId = Math.max(...DUMMY_TRAINING_DATA.map(t => t.id)) + 1
   const newTraining = {
     id: newId,
-    ...trainingData,
+    user_id: trainingData.user_id,
+    tema: trainingData.tema,
+    penyelenggara: trainingData.penyelenggara,
+    tanggal_mulai: trainingData.tanggal_mulai,
+    tanggal_selesai: trainingData.tanggal_selesai,
+    keterangan: trainingData.keterangan,
+    sertifikat_filename: null,
     status: 'selesai',
     created_at: new Date().toISOString(),
     pegawai_nama: 'Current User',
@@ -83,7 +106,14 @@ export function addFallbackTrainingData(trainingData) {
 export function updateFallbackTrainingData(trainingId, trainingData) {
   const index = DUMMY_TRAINING_DATA.findIndex(t => t.id === parseInt(trainingId))
   if (index !== -1) {
-    DUMMY_TRAINING_DATA[index] = { ...DUMMY_TRAINING_DATA[index], ...trainingData }
+    DUMMY_TRAINING_DATA[index] = {
+      ...DUMMY_TRAINING_DATA[index],
+      tema: trainingData.tema,
+      penyelenggara: trainingData.penyelenggara,
+      tanggal_mulai: trainingData.tanggal_mulai,
+      tanggal_selesai: trainingData.tanggal_selesai,
+      keterangan: trainingData.keterangan
+    }
     return { success: true }
   }
   return { success: false, message: 'Data tidak ditemukan' }

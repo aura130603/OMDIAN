@@ -20,13 +20,21 @@ export default function TrainingHistory() {
 
   useEffect(() => {
     if (user) {
-      if (user.role === 'admin') {
-        const data = getAllTrainingData()
-        setTrainingData(data)
-      } else {
-        const data = getUserTrainingData(user.id)
-        setTrainingData(data)
+      const loadTrainingData = async () => {
+        try {
+          if (user.role === 'admin') {
+            const data = await getAllTrainingData()
+            setTrainingData(data)
+          } else {
+            const data = await getUserTrainingData(user.id)
+            setTrainingData(data)
+          }
+        } catch (error) {
+          console.error('Error loading training data:', error)
+          setTrainingData([])
+        }
       }
+      loadTrainingData()
     }
   }, [user, getUserTrainingData, getAllTrainingData])
 
@@ -45,10 +53,10 @@ export default function TrainingHistory() {
       const result = await deleteTrainingData(trainingId)
       if (result.success) {
         if (user.role === 'admin') {
-          const updatedData = getAllTrainingData()
+          const updatedData = await getAllTrainingData()
           setTrainingData(updatedData)
         } else {
-          const updatedData = getUserTrainingData(user.id)
+          const updatedData = await getUserTrainingData(user.id)
           setTrainingData(updatedData)
         }
       }
@@ -60,10 +68,10 @@ export default function TrainingHistory() {
       const result = await updateTrainingData(editingTraining.id, formData)
       if (result.success) {
         if (user.role === 'admin') {
-          const updatedData = getAllTrainingData()
+          const updatedData = await getAllTrainingData()
           setTrainingData(updatedData)
         } else {
-          const updatedData = getUserTrainingData(user.id)
+          const updatedData = await getUserTrainingData(user.id)
           setTrainingData(updatedData)
         }
         setShowModal(false)
@@ -72,10 +80,10 @@ export default function TrainingHistory() {
       const result = await addTrainingData(formData)
       if (result.success) {
         if (user.role === 'admin') {
-          const updatedData = getAllTrainingData()
+          const updatedData = await getAllTrainingData()
           setTrainingData(updatedData)
         } else {
-          const updatedData = getUserTrainingData(user.id)
+          const updatedData = await getUserTrainingData(user.id)
           setTrainingData(updatedData)
         }
         setShowModal(false)

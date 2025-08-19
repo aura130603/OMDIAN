@@ -175,68 +175,177 @@ export default function EmployeeManagement() {
         <div className="dashboard-content">
           <div className="card">
             <div className="card-header">
-              <div style={{ 
-                display: 'flex', 
-                justifyContent: 'space-between', 
+              {/* Header with title and add button */}
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
                 alignItems: 'center',
-                marginBottom: '20px'
+                marginBottom: '24px'
               }}>
                 <h2 className="card-title">Data Pegawai ({filteredEmployees.length})</h2>
-                <button className="btn-add" onClick={handleAddEmployee}>
+                <button
+                  className="btn-add"
+                  onClick={handleAddEmployee}
+                  style={{
+                    padding: '10px 20px',
+                    fontSize: '14px',
+                    borderRadius: '6px',
+                    background: 'linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-medium) 100%)',
+                    color: 'white',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontWeight: '500',
+                    transition: 'all 0.2s ease',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.transform = 'translateY(-1px)'
+                    e.target.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.transform = 'translateY(0)'
+                    e.target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)'
+                  }}
+                >
                   + Tambah Pegawai
                 </button>
               </div>
 
-              {/* Filters */}
-              <div style={{ 
-                display: 'grid', 
-                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
-                gap: '15px',
-                marginBottom: '20px',
-                padding: '15px',
-                backgroundColor: 'var(--light-gray)',
-                borderRadius: '8px'
+              {/* Search and Filters */}
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px',
+                marginBottom: '24px'
               }}>
-                <input
-                  type="text"
-                  placeholder="Cari nama, NIP, jabatan..."
-                  className="form-input"
-                  style={{ marginBottom: '0' }}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-                <select
-                  className="form-input"
-                  style={{ marginBottom: '0' }}
-                  value={filters.pangkat}
-                  onChange={(e) => handleFilterChange('pangkat', e.target.value)}
-                >
-                  <option value="">Semua Pangkat</option>
-                  {uniquePangkat.map(pangkat => (
-                    <option key={pangkat} value={pangkat}>{pangkat}</option>
-                  ))}
-                </select>
-                <select
-                  className="form-input"
-                  style={{ marginBottom: '0' }}
-                  value={filters.golongan}
-                  onChange={(e) => handleFilterChange('golongan', e.target.value)}
-                >
-                  <option value="">Semua Golongan</option>
-                  {uniqueGolongan.map(golongan => (
-                    <option key={golongan} value={golongan}>{golongan}</option>
-                  ))}
-                </select>
-                <select
-                  className="form-input"
-                  style={{ marginBottom: '0' }}
-                  value={filters.status}
-                  onChange={(e) => handleFilterChange('status', e.target.value)}
-                >
-                  <option value="all">Semua Status</option>
-                  <option value="complete">Sudah Lengkap {currentYear}</option>
-                  <option value="incomplete">Belum Lengkap {currentYear}</option>
-                </select>
+                {/* Search bar */}
+                <div style={{
+                  position: 'relative',
+                  maxWidth: '400px'
+                }}>
+                  <input
+                    type="text"
+                    placeholder="🔍 Cari nama, NIP, jabatan..."
+                    className="form-input"
+                    style={{
+                      marginBottom: '0',
+                      paddingLeft: '12px',
+                      fontSize: '14px',
+                      border: '1.5px solid var(--border-color)',
+                      borderRadius: '8px',
+                      transition: 'all 0.2s ease',
+                      width: '100%'
+                    }}
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = 'var(--primary-medium)'
+                      e.target.style.boxShadow = '0 0 0 3px rgba(203, 210, 164, 0.1)'
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = 'var(--border-color)'
+                      e.target.style.boxShadow = 'none'
+                    }}
+                  />
+                </div>
+
+                {/* Filter row */}
+                <div style={{
+                  display: 'flex',
+                  gap: '12px',
+                  flexWrap: 'wrap',
+                  alignItems: 'center'
+                }}>
+                  <span style={{
+                    fontSize: '14px',
+                    color: 'var(--text-medium)',
+                    fontWeight: '500',
+                    minWidth: '60px'
+                  }}>Filter:</span>
+                  <select
+                    className="form-input"
+                    style={{
+                      marginBottom: '0',
+                      minWidth: '160px',
+                      fontSize: '14px',
+                      border: '1.5px solid var(--border-color)',
+                      borderRadius: '6px',
+                      padding: '8px 12px',
+                      backgroundColor: 'white',
+                      cursor: 'pointer'
+                    }}
+                    value={filters.pangkat}
+                    onChange={(e) => handleFilterChange('pangkat', e.target.value)}
+                  >
+                    <option value="">Semua Pangkat</option>
+                    {uniquePangkat.map(pangkat => (
+                      <option key={pangkat} value={pangkat}>{pangkat}</option>
+                    ))}
+                  </select>
+
+                  <select
+                    className="form-input"
+                    style={{
+                      marginBottom: '0',
+                      minWidth: '160px',
+                      fontSize: '14px',
+                      border: '1.5px solid var(--border-color)',
+                      borderRadius: '6px',
+                      padding: '8px 12px',
+                      backgroundColor: 'white',
+                      cursor: 'pointer'
+                    }}
+                    value={filters.golongan}
+                    onChange={(e) => handleFilterChange('golongan', e.target.value)}
+                  >
+                    <option value="">Semua Golongan</option>
+                    {uniqueGolongan.map(golongan => (
+                      <option key={golongan} value={golongan}>{golongan}</option>
+                    ))}
+                  </select>
+
+                  <select
+                    className="form-input"
+                    style={{
+                      marginBottom: '0',
+                      minWidth: '180px',
+                      fontSize: '14px',
+                      border: '1.5px solid var(--border-color)',
+                      borderRadius: '6px',
+                      padding: '8px 12px',
+                      backgroundColor: 'white',
+                      cursor: 'pointer'
+                    }}
+                    value={filters.status}
+                    onChange={(e) => handleFilterChange('status', e.target.value)}
+                  >
+                    <option value="all">Semua Status</option>
+                    <option value="complete">Sudah Lengkap {currentYear}</option>
+                    <option value="incomplete">Belum Lengkap {currentYear}</option>
+                  </select>
+
+                  {/* Clear filters button */}
+                  {(searchTerm || filters.pangkat || filters.golongan || filters.status !== 'all') && (
+                    <button
+                      onClick={() => {
+                        setSearchTerm('')
+                        setFilters({ pangkat: '', golongan: '', status: 'all' })
+                      }}
+                      style={{
+                        padding: '8px 12px',
+                        fontSize: '12px',
+                        border: '1px solid var(--error)',
+                        borderRadius: '4px',
+                        backgroundColor: 'transparent',
+                        color: 'var(--error)',
+                        cursor: 'pointer',
+                        fontWeight: '500'
+                      }}
+                    >
+                      ✕ Reset
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
 

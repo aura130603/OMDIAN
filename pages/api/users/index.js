@@ -3,6 +3,25 @@
 // Import dummy users data
 import { DUMMY_USERS } from './dummy-operations'
 
+// Helper function to map user data consistently
+const mapUserData = (user) => ({
+  id: user.id,
+  username: user.username,
+  nip: user.nip,
+  nama: user.nama,
+  pangkat: user.pangkat,
+  golongan: user.golongan,
+  jabatan: user.jabatan,
+  pendidikan: user.pendidikan,
+  nilaiSKP: user.nilai_skp,
+  hukumanDisiplin: user.hukuman_disiplin,
+  diklatPIM: user.diklat_pim,
+  diklatFungsional: user.diklat_fungsional,
+  role: user.role,
+  status: user.status,
+  createdAt: user.created_at
+})
+
 export default async function handler(req, res) {
   try {
     switch (req.method) {
@@ -38,23 +57,7 @@ async function getUsers(req, res) {
     })
   }
 
-  const mappedUsers = DUMMY_USERS.map(user => ({
-    id: user.id,
-    username: user.username,
-    nip: user.nip,
-    nama: user.nama,
-    pangkat: user.pangkat,
-    golongan: user.golongan,
-    jabatan: user.jabatan,
-    pendidikan: user.pendidikan,
-    nilaiSKP: user.nilai_skp,
-    hukumanDisiplin: user.hukuman_disiplin,
-    diklatPIM: user.diklat_pim,
-    diklatFungsional: user.diklat_fungsional,
-    role: user.role,
-    status: user.status,
-    createdAt: user.created_at
-  }))
+  const mappedUsers = DUMMY_USERS.map(mapUserData)
 
   console.log('✅ Users data retrieved with dummy data')
 
@@ -181,24 +184,27 @@ async function updateUser(req, res) {
   }
 
   // Update user data
-  DUMMY_USERS[userIndex] = {
+  const updatedUser = {
     ...DUMMY_USERS[userIndex],
-    username,
-    nama,
-    pangkat,
-    golongan,
-    jabatan,
-    pendidikan,
-    nilai_skp: nilaiSKP || null,
-    hukuman_disiplin: hukumanDisiplin || 'Tidak Pernah',
-    diklat_pim: diklatPIM || 'Belum',
-    diklat_fungsional: diklatFungsional || 'Belum'
+    username: username || DUMMY_USERS[userIndex].username,
+    nama: nama || DUMMY_USERS[userIndex].nama,
+    pangkat: pangkat || DUMMY_USERS[userIndex].pangkat,
+    golongan: golongan || DUMMY_USERS[userIndex].golongan,
+    jabatan: jabatan || DUMMY_USERS[userIndex].jabatan,
+    pendidikan: pendidikan || DUMMY_USERS[userIndex].pendidikan,
+    nilai_skp: nilaiSKP !== undefined ? nilaiSKP : DUMMY_USERS[userIndex].nilai_skp,
+    hukuman_disiplin: hukumanDisiplin || DUMMY_USERS[userIndex].hukuman_disiplin,
+    diklat_pim: diklatPIM || DUMMY_USERS[userIndex].diklat_pim,
+    diklat_fungsional: diklatFungsional || DUMMY_USERS[userIndex].diklat_fungsional
   }
 
   // Update password if provided
   if (password) {
-    DUMMY_USERS[userIndex].password = password // In real app, this would be hashed
+    updatedUser.password = password // In real app, this would be hashed
   }
+
+  // Replace the user in array
+  DUMMY_USERS[userIndex] = updatedUser
 
   console.log('✅ User updated with dummy data')
 

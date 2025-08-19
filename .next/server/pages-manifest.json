@@ -1,0 +1,10 @@
+{
+  "/_error": "pages/_error.js",
+  "/_document": "pages/_document.js",
+  "/_app": "pages/_app.js",
+  "/training-history": "pages/training-history.js",
+  "/dashboard": "pages/dashboard.js",
+  "/api/training": "pages/api/training.js",
+  "/employee-management": "pages/employee-management.js",
+  "/api/users/dummy": "pages/api/users/dummy.js"
+}

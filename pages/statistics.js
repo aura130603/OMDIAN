@@ -168,9 +168,9 @@ export default function Statistics() {
                     <button className="btn btn-secondary" onClick={handleExportTrainingReport}>
                       📈 Export Data Pelatihan
                     </button>
-                    <button className="btn btn-secondary" onClick={() => handleExportPDF('overview')}>
+                    {/* <button className="btn btn-secondary" onClick={() => handleExportPDF('overview')}>
                       📄 Export PDF
-                    </button>
+                    </button> */}
                   </div>
                 )}
               </div>

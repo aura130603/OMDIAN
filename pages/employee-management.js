@@ -12,11 +12,7 @@ export default function EmployeeManagement() {
   const [showModal, setShowModal] = useState(false)
   const [editingEmployee, setEditingEmployee] = useState(null)
   const [searchTerm, setSearchTerm] = useState('')
-  const [filters, setFilters] = useState({
-    pangkat: '',
-    golongan: '',
-    status: 'all'
-  })
+  // Removed filters state as filters are no longer needed
 
   useEffect(() => {
     if (!loading && (!user || user.role !== 'admin')) {
@@ -88,44 +84,23 @@ export default function EmployeeManagement() {
     }
   }
 
-  const handleFilterChange = (field, value) => {
-    setFilters(prev => ({
-      ...prev,
-      [field]: value
-    }))
-  }
+  // Removed handleFilterChange as filters are no longer needed
 
   const getFilteredEmployees = () => {
-    const currentYear = new Date().getFullYear()
-    
     return allUsers.filter(employee => {
-      const searchMatch = 
+      const searchMatch =
         employee.nama.toLowerCase().includes(searchTerm.toLowerCase()) ||
         employee.nip.includes(searchTerm) ||
         employee.jabatan.toLowerCase().includes(searchTerm.toLowerCase())
 
-      const pangkatMatch = !filters.pangkat || employee.pangkat === filters.pangkat
-      const golonganMatch = !filters.golongan || employee.golongan === filters.golongan
-
-      let statusMatch = true
-      if (filters.status !== 'all') {
-        const hasCurrentYearTraining = allTraining.some(training => {
-          const year = new Date(training.tanggalMulai).getFullYear()
-          return training.pegawaiId === employee.id && year === currentYear
-        })
-        statusMatch = filters.status === 'complete' ? hasCurrentYearTraining : !hasCurrentYearTraining
-      }
-
-      return searchMatch && pangkatMatch && golonganMatch && statusMatch
+      return searchMatch
     })
   }
 
   const filteredEmployees = getFilteredEmployees()
   const currentYear = new Date().getFullYear()
   
-  // Get unique values for filter options
-  const uniquePangkat = [...new Set(allUsers.map(u => u.pangkat))].sort()
-  const uniqueGolongan = [...new Set(allUsers.map(u => u.golongan))].sort()
+  // Removed unique values for filters as they are no longer needed
 
   if (loading) {
     return (
@@ -175,54 +150,18 @@ export default function EmployeeManagement() {
         <div className="dashboard-content">
           <div className="card">
             <div className="card-header">
-              {/* Header with title and add button */}
+              {/* Single row with title, search, and add button */}
               <div style={{
                 display: 'flex',
-                justifyContent: 'space-between',
                 alignItems: 'center',
+                gap: '20px',
                 marginBottom: '24px'
               }}>
-                <h2 className="card-title">Data Pegawai ({filteredEmployees.length})</h2>
-                <button
-                  className="btn-add"
-                  onClick={handleAddEmployee}
-                  style={{
-                    padding: '10px 20px',
-                    fontSize: '14px',
-                    borderRadius: '6px',
-                    background: 'linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-medium) 100%)',
-                    color: 'white',
-                    border: 'none',
-                    cursor: 'pointer',
-                    fontWeight: '500',
-                    transition: 'all 0.2s ease',
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.transform = 'translateY(-1px)'
-                    e.target.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)'
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.transform = 'translateY(0)'
-                    e.target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)'
-                  }}
-                >
-                  + Tambah Pegawai
-                </button>
-              </div>
+                <h2 className="card-title" style={{ margin: 0, minWidth: 'fit-content' }}>
+                  Data Pegawai ({filteredEmployees.length})
+                </h2>
 
-              {/* Search and Filters */}
-              <div style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '16px',
-                marginBottom: '24px'
-              }}>
-                {/* Search bar */}
-                <div style={{
-                  position: 'relative',
-                  maxWidth: '400px'
-                }}>
+                <div style={{ flex: 1, maxWidth: '400px' }}>
                   <input
                     type="text"
                     placeholder="🔍 Cari nama, NIP, jabatan..."
@@ -249,121 +188,52 @@ export default function EmployeeManagement() {
                   />
                 </div>
 
-                {/* Filter row */}
-                <div style={{
-                  display: 'flex',
-                  gap: '12px',
-                  flexWrap: 'wrap',
-                  alignItems: 'center'
-                }}>
-                  <span style={{
+                <button
+                  className="btn-add"
+                  onClick={handleAddEmployee}
+                  style={{
+                    padding: '10px 20px',
                     fontSize: '14px',
-                    color: 'var(--text-medium)',
+                    borderRadius: '6px',
+                    background: 'linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-medium) 100%)',
+                    color: 'white',
+                    border: 'none',
+                    cursor: 'pointer',
                     fontWeight: '500',
-                    minWidth: '60px'
-                  }}>Filter:</span>
-                  <select
-                    className="form-input"
-                    style={{
-                      marginBottom: '0',
-                      minWidth: '160px',
-                      fontSize: '14px',
-                      border: '1.5px solid var(--border-color)',
-                      borderRadius: '6px',
-                      padding: '8px 12px',
-                      backgroundColor: 'white',
-                      cursor: 'pointer'
-                    }}
-                    value={filters.pangkat}
-                    onChange={(e) => handleFilterChange('pangkat', e.target.value)}
-                  >
-                    <option value="">Semua Pangkat</option>
-                    {uniquePangkat.map(pangkat => (
-                      <option key={pangkat} value={pangkat}>{pangkat}</option>
-                    ))}
-                  </select>
-
-                  <select
-                    className="form-input"
-                    style={{
-                      marginBottom: '0',
-                      minWidth: '160px',
-                      fontSize: '14px',
-                      border: '1.5px solid var(--border-color)',
-                      borderRadius: '6px',
-                      padding: '8px 12px',
-                      backgroundColor: 'white',
-                      cursor: 'pointer'
-                    }}
-                    value={filters.golongan}
-                    onChange={(e) => handleFilterChange('golongan', e.target.value)}
-                  >
-                    <option value="">Semua Golongan</option>
-                    {uniqueGolongan.map(golongan => (
-                      <option key={golongan} value={golongan}>{golongan}</option>
-                    ))}
-                  </select>
-
-                  <select
-                    className="form-input"
-                    style={{
-                      marginBottom: '0',
-                      minWidth: '180px',
-                      fontSize: '14px',
-                      border: '1.5px solid var(--border-color)',
-                      borderRadius: '6px',
-                      padding: '8px 12px',
-                      backgroundColor: 'white',
-                      cursor: 'pointer'
-                    }}
-                    value={filters.status}
-                    onChange={(e) => handleFilterChange('status', e.target.value)}
-                  >
-                    <option value="all">Semua Status</option>
-                    <option value="complete">Sudah Lengkap {currentYear}</option>
-                    <option value="incomplete">Belum Lengkap {currentYear}</option>
-                  </select>
-
-                  {/* Clear filters button */}
-                  {(searchTerm || filters.pangkat || filters.golongan || filters.status !== 'all') && (
-                    <button
-                      onClick={() => {
-                        setSearchTerm('')
-                        setFilters({ pangkat: '', golongan: '', status: 'all' })
-                      }}
-                      style={{
-                        padding: '8px 12px',
-                        fontSize: '12px',
-                        border: '1px solid var(--error)',
-                        borderRadius: '4px',
-                        backgroundColor: 'transparent',
-                        color: 'var(--error)',
-                        cursor: 'pointer',
-                        fontWeight: '500'
-                      }}
-                    >
-                      ✕ Reset
-                    </button>
-                  )}
-                </div>
+                    transition: 'all 0.2s ease',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                    minWidth: 'fit-content',
+                    whiteSpace: 'nowrap'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.transform = 'translateY(-1px)'
+                    e.target.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.transform = 'translateY(0)'
+                    e.target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)'
+                  }}
+                >
+                  + Tambah Pegawai
+                </button>
               </div>
             </div>
 
             {filteredEmployees.length === 0 ? (
-              <div style={{ 
-                textAlign: 'center', 
-                padding: '60px 40px', 
-                color: 'var(--text-medium)' 
+              <div style={{
+                textAlign: 'center',
+                padding: '60px 40px',
+                color: 'var(--text-medium)'
               }}>
                 <div style={{ fontSize: '48px', marginBottom: '20px' }}>👥</div>
                 <h3 style={{ marginBottom: '10px', color: 'var(--primary-darkest)' }}>
-                  {searchTerm || filters.pangkat || filters.golongan || filters.status !== 'all' 
-                    ? 'Tidak ada data yang sesuai' 
+                  {searchTerm
+                    ? 'Tidak ada data yang sesuai'
                     : 'Belum ada data pegawai'}
                 </h3>
                 <p>
-                  {searchTerm || filters.pangkat || filters.golongan || filters.status !== 'all'
-                    ? 'Coba ubah kriteria filter atau pencarian'
+                  {searchTerm
+                    ? 'Coba ubah kata kunci pencarian'
                     : 'Klik "Tambah Pegawai" untuk menambah data pegawai baru'
                   }
                 </p>
@@ -434,7 +304,7 @@ export default function EmployeeManagement() {
                                 }}
                                 title="Edit data pegawai"
                               >
-                                ✏️ Edit
+                                ���️ Edit
                               </button>
                               {pegawai.role !== 'admin' && (
                                 <button

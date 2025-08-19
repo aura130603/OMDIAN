@@ -50,37 +50,70 @@ export default function EmployeeManagement() {
 
   const handleDeleteEmployee = async (employeeId) => {
     if (window.confirm('Apakah Anda yakin ingin menghapus data pegawai ini?')) {
-      const result = await deleteUser(employeeId)
-      if (result.success) {
-        const updatedUsers = await getAllUsers()
-        const updatedTraining = await getAllTrainingData()
-        setAllUsers(updatedUsers)
-        setAllTraining(updatedTraining)
-      } else {
-        alert(result.message)
+      try {
+        const result = await deleteUser(employeeId)
+        if (result.success) {
+          // Immediately update the local state to remove the deleted employee
+          setAllUsers(prevUsers => prevUsers.filter(user => user.id !== employeeId))
+
+          // Also refresh data from API to ensure consistency
+          const updatedUsers = await getAllUsers()
+          const updatedTraining = await getAllTrainingData()
+          setAllUsers(updatedUsers)
+          setAllTraining(updatedTraining)
+
+          alert('Pegawai berhasil dihapus')
+        } else {
+          alert(result.message || 'Gagal menghapus pegawai')
+        }
+      } catch (error) {
+        console.error('Error deleting employee:', error)
+        alert('Terjadi kesalahan saat menghapus pegawai')
       }
     }
   }
 
   const handleSaveEmployee = async (employeeData) => {
-    if (editingEmployee) {
-      const result = await updateUser(editingEmployee.id, employeeData)
-      if (result.success) {
-        const updatedUsers = await getAllUsers()
-        setAllUsers(updatedUsers)
-        setShowModal(false)
+    try {
+      if (editingEmployee) {
+        // Update existing employee
+        const result = await updateUser(editingEmployee.id, employeeData)
+        if (result.success) {
+          // Immediately update local state with edited data
+          setAllUsers(prevUsers =>
+            prevUsers.map(user =>
+              user.id === editingEmployee.id
+                ? { ...user, ...employeeData, id: editingEmployee.id }
+                : user
+            )
+          )
+
+          // Also refresh from API to ensure consistency
+          const updatedUsers = await getAllUsers()
+          setAllUsers(updatedUsers)
+
+          setShowModal(false)
+          alert('Data pegawai berhasil diperbarui')
+        } else {
+          alert(result.message || 'Gagal memperbarui data pegawai')
+        }
       } else {
-        alert(result.message)
+        // Add new employee
+        const result = await addUser(employeeData)
+        if (result.success) {
+          // Refresh data from API to get the new employee with proper ID
+          const updatedUsers = await getAllUsers()
+          setAllUsers(updatedUsers)
+
+          setShowModal(false)
+          alert('Pegawai berhasil ditambahkan')
+        } else {
+          alert(result.message || 'Gagal menambahkan pegawai')
+        }
       }
-    } else {
-      const result = await addUser(employeeData)
-      if (result.success) {
-        const updatedUsers = await getAllUsers()
-        setAllUsers(updatedUsers)
-        setShowModal(false)
-      } else {
-        alert(result.message)
-      }
+    } catch (error) {
+      console.error('Error saving employee:', error)
+      alert('Terjadi kesalahan saat menyimpan data pegawai')
     }
   }
 
@@ -304,7 +337,7 @@ export default function EmployeeManagement() {
                                 }}
                                 title="Edit data pegawai"
                               >
-                                ���️ Edit
+                                ✏️ Edit
                               </button>
                               {pegawai.role !== 'admin' && (
                                 <button

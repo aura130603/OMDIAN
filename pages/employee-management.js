@@ -409,24 +409,59 @@ export default function EmployeeManagement() {
                             </span>
                           </td>
                           <td>
-                            <div style={{ display: 'flex', gap: '5px' }}>
-                              <button 
+                            <div style={{ display: 'flex', gap: '6px', justifyContent: 'center' }}>
+                              <button
                                 className="btn btn-small btn-secondary"
                                 onClick={() => handleEditEmployee(pegawai)}
+                                style={{
+                                  fontSize: '11px',
+                                  padding: '6px 12px',
+                                  borderRadius: '4px',
+                                  border: '1px solid var(--primary-medium)',
+                                  backgroundColor: 'transparent',
+                                  color: 'var(--primary-dark)',
+                                  cursor: 'pointer',
+                                  fontWeight: '500',
+                                  transition: 'all 0.2s ease'
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.target.style.backgroundColor = 'var(--primary-medium)'
+                                  e.target.style.color = 'white'
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.target.style.backgroundColor = 'transparent'
+                                  e.target.style.color = 'var(--primary-dark)'
+                                }}
+                                title="Edit data pegawai"
                               >
-                                Edit
+                                ✏️ Edit
                               </button>
                               {pegawai.role !== 'admin' && (
-                                <button 
+                                <button
                                   className="btn btn-small"
-                                  style={{ 
-                                    backgroundColor: 'var(--error)',
-                                    color: 'var(--white)',
-                                    fontSize: '11px'
+                                  style={{
+                                    fontSize: '11px',
+                                    padding: '6px 12px',
+                                    borderRadius: '4px',
+                                    border: '1px solid var(--error)',
+                                    backgroundColor: 'transparent',
+                                    color: 'var(--error)',
+                                    cursor: 'pointer',
+                                    fontWeight: '500',
+                                    transition: 'all 0.2s ease'
+                                  }}
+                                  onMouseEnter={(e) => {
+                                    e.target.style.backgroundColor = 'var(--error)'
+                                    e.target.style.color = 'white'
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.target.style.backgroundColor = 'transparent'
+                                    e.target.style.color = 'var(--error)'
                                   }}
                                   onClick={() => handleDeleteEmployee(pegawai.id)}
+                                  title="Hapus pegawai"
                                 >
-                                  Hapus
+                                  🗑️ Hapus
                                 </button>
                               )}
                             </div>

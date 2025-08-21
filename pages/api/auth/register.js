@@ -1,4 +1,5 @@
-// Simple registration with dummy data (no database)
+import bcrypt from 'bcryptjs'
+import { executeQuery } from '../../../lib/db'
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -43,12 +44,65 @@ export default async function handler(req, res) {
       })
     }
 
-    // Simple validation for demo (no database check)
-    console.log('✅ Registration attempt with dummy data:', username)
+    // Check if username or NIP already exists
+    const checkQuery = 'SELECT id FROM users WHERE username = ? OR nip = ?'
+    const existingUser = await executeQuery(checkQuery, [username, nip])
+
+    if (!existingUser.success) {
+      return res.status(500).json({
+        success: false,
+        message: 'Gagal memeriksa data existing'
+      })
+    }
+
+    if (existingUser.data.length > 0) {
+      return res.status(409).json({ 
+        success: false, 
+        message: 'Username atau NIP sudah digunakan' 
+      })
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10)
+
+    // Insert new user
+    const insertQuery = `
+      INSERT INTO users (
+        username, password, nip, nama, pangkat, golongan, jabatan, pendidikan,
+        nilai_skp, hukuman_disiplin, diklat_pim, diklat_fungsional, role, status
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pegawai', 'aktif')
+    `
+
+    const insertParams = [
+      username,
+      hashedPassword,
+      nip,
+      nama,
+      pangkat,
+      golongan,
+      jabatan,
+      pendidikan,
+      nilaiSKP || null,
+      hukumanDisiplin || 'Tidak Pernah',
+      diklatPIM || 'Belum',
+      diklatFungsional || 'Belum'
+    ]
+
+    const result = await executeQuery(insertQuery, insertParams)
+
+    if (!result.success) {
+      console.error('Insert user error:', result.error)
+      return res.status(500).json({
+        success: false,
+        message: 'Gagal mendaftarkan pengguna'
+      })
+    }
+
+    console.log('✅ Registration successful in database:', username)
 
     res.status(201).json({
       success: true,
-      message: 'Registrasi berhasil! Silakan login dengan akun demo yang tersedia.'
+      message: 'Registrasi berhasil! Silakan login dengan akun yang baru dibuat.'
     })
 
   } catch (error) {

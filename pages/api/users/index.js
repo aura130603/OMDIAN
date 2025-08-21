@@ -1,26 +1,5 @@
-// Users API with dummy data operations (no database)
-
-// Import dummy users data
-import { DUMMY_USERS } from './dummy-operations'
-
-// Helper function to map user data consistently
-const mapUserData = (user) => ({
-  id: user.id,
-  username: user.username,
-  nip: user.nip,
-  nama: user.nama,
-  pangkat: user.pangkat,
-  golongan: user.golongan,
-  jabatan: user.jabatan,
-  pendidikan: user.pendidikan,
-  nilaiSKP: user.nilai_skp,
-  hukumanDisiplin: user.hukuman_disiplin,
-  diklatPIM: user.diklat_pim,
-  diklatFungsional: user.diklat_fungsional,
-  role: user.role,
-  status: user.status,
-  createdAt: user.created_at
-})
+import { executeQuery } from '../../../lib/db'
+import bcrypt from 'bcryptjs'
 
 export default async function handler(req, res) {
   try {
@@ -57,13 +36,42 @@ async function getUsers(req, res) {
     })
   }
 
-  const mappedUsers = DUMMY_USERS.map(mapUserData)
+  const query = `
+    SELECT 
+      id,
+      username,
+      nip,
+      nama,
+      pangkat,
+      golongan,
+      jabatan,
+      pendidikan,
+      nilai_skp as nilaiSKP,
+      hukuman_disiplin as hukumanDisiplin,
+      diklat_pim as diklatPIM,
+      diklat_fungsional as diklatFungsional,
+      role,
+      status,
+      created_at as createdAt
+    FROM users 
+    ORDER BY created_at DESC
+  `
 
-  console.log('✅ Users data retrieved with dummy data')
+  const result = await executeQuery(query)
+
+  if (!result.success) {
+    console.error('Database error:', result.error)
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal mengambil data pengguna'
+    })
+  }
+
+  console.log('✅ Users data retrieved from database')
 
   res.status(200).json({
     success: true,
-    data: mappedUsers
+    data: result.data
   })
 }
 
@@ -102,38 +110,60 @@ async function createUser(req, res) {
   }
 
   // Check if username or NIP already exists
-  const existingUser = DUMMY_USERS.find(u => u.username === username || u.nip === nip)
-  if (existingUser) {
+  const checkQuery = 'SELECT id FROM users WHERE username = ? OR nip = ?'
+  const existingUser = await executeQuery(checkQuery, [username, nip])
+
+  if (!existingUser.success) {
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal memeriksa data existing'
+    })
+  }
+
+  if (existingUser.data.length > 0) {
     return res.status(409).json({ 
       success: false, 
       message: 'Username atau NIP sudah digunakan' 
     })
   }
 
-  // Add new user to dummy data
-  const newId = Math.max(...DUMMY_USERS.map(u => u.id)) + 1
-  const newUser = {
-    id: newId,
+  // Hash password
+  const hashedPassword = await bcrypt.hash(password, 10)
+
+  // Insert new user
+  const insertQuery = `
+    INSERT INTO users (
+      username, password, nip, nama, pangkat, golongan, jabatan, pendidikan,
+      nilai_skp, hukuman_disiplin, diklat_pim, diklat_fungsional, role, status
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pegawai', 'aktif')
+  `
+
+  const insertParams = [
     username,
-    password, // In real app, this would be hashed
+    hashedPassword,
     nip,
     nama,
     pangkat,
     golongan,
     jabatan,
     pendidikan,
-    nilai_skp: nilaiSKP || null,
-    hukuman_disiplin: hukumanDisiplin || 'Tidak Pernah',
-    diklat_pim: diklatPIM || 'Belum',
-    diklat_fungsional: diklatFungsional || 'Belum',
-    role: 'pegawai',
-    status: 'aktif',
-    created_at: new Date().toISOString()
+    nilaiSKP || null,
+    hukumanDisiplin || 'Tidak Pernah',
+    diklatPIM || 'Belum',
+    diklatFungsional || 'Belum'
+  ]
+
+  const result = await executeQuery(insertQuery, insertParams)
+
+  if (!result.success) {
+    console.error('Insert user error:', result.error)
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal menambahkan pengguna'
+    })
   }
 
-  DUMMY_USERS.push(newUser)
-
-  console.log('✅ User created with dummy data')
+  console.log('✅ User created in database')
 
   res.status(201).json({
     success: true,
@@ -174,39 +204,51 @@ async function updateUser(req, res) {
     })
   }
 
-  // Find user to update
-  const userIndex = DUMMY_USERS.findIndex(u => u.id === parseInt(id))
-  if (userIndex === -1) {
+  // Check if user exists
+  const checkQuery = 'SELECT id FROM users WHERE id = ?'
+  const existingUser = await executeQuery(checkQuery, [id])
+
+  if (!existingUser.success || existingUser.data.length === 0) {
     return res.status(404).json({ 
       success: false, 
       message: 'Pengguna tidak ditemukan' 
     })
   }
 
-  // Update user data
-  const updatedUser = {
-    ...DUMMY_USERS[userIndex],
-    username: username || DUMMY_USERS[userIndex].username,
-    nama: nama || DUMMY_USERS[userIndex].nama,
-    pangkat: pangkat || DUMMY_USERS[userIndex].pangkat,
-    golongan: golongan || DUMMY_USERS[userIndex].golongan,
-    jabatan: jabatan || DUMMY_USERS[userIndex].jabatan,
-    pendidikan: pendidikan || DUMMY_USERS[userIndex].pendidikan,
-    nilai_skp: nilaiSKP !== undefined ? nilaiSKP : DUMMY_USERS[userIndex].nilai_skp,
-    hukuman_disiplin: hukumanDisiplin || DUMMY_USERS[userIndex].hukuman_disiplin,
-    diklat_pim: diklatPIM || DUMMY_USERS[userIndex].diklat_pim,
-    diklat_fungsional: diklatFungsional || DUMMY_USERS[userIndex].diklat_fungsional
-  }
+  // Build update query
+  let updateQuery = `
+    UPDATE users SET 
+      username = ?, nama = ?, pangkat = ?, golongan = ?, jabatan = ?, 
+      pendidikan = ?, nilai_skp = ?, hukuman_disiplin = ?, 
+      diklat_pim = ?, diklat_fungsional = ?
+  `
+  let updateParams = [
+    username, nama, pangkat, golongan, jabatan, pendidikan,
+    nilaiSKP || null, hukumanDisiplin || 'Tidak Pernah',
+    diklatPIM || 'Belum', diklatFungsional || 'Belum'
+  ]
 
-  // Update password if provided
+  // Add password to update if provided
   if (password) {
-    updatedUser.password = password // In real app, this would be hashed
+    const hashedPassword = await bcrypt.hash(password, 10)
+    updateQuery += ', password = ?'
+    updateParams.push(hashedPassword)
   }
 
-  // Replace the user in array
-  DUMMY_USERS[userIndex] = updatedUser
+  updateQuery += ' WHERE id = ?'
+  updateParams.push(id)
 
-  console.log('✅ User updated with dummy data')
+  const result = await executeQuery(updateQuery, updateParams)
+
+  if (!result.success) {
+    console.error('Update user error:', result.error)
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal memperbarui pengguna'
+    })
+  }
+
+  console.log('✅ User updated in database')
 
   res.status(200).json({
     success: true,
@@ -233,9 +275,11 @@ async function deleteUser(req, res) {
     })
   }
 
-  // Find user to delete
-  const userIndex = DUMMY_USERS.findIndex(u => u.id === parseInt(id))
-  if (userIndex === -1) {
+  // Check if user exists and get role
+  const checkQuery = 'SELECT role FROM users WHERE id = ?'
+  const existingUser = await executeQuery(checkQuery, [id])
+
+  if (!existingUser.success || existingUser.data.length === 0) {
     return res.status(404).json({ 
       success: false, 
       message: 'Pengguna tidak ditemukan' 
@@ -243,7 +287,7 @@ async function deleteUser(req, res) {
   }
 
   // Check if user is admin (don't allow deleting admin users)
-  if (DUMMY_USERS[userIndex].role === 'admin') {
+  if (existingUser.data[0].role === 'admin') {
     return res.status(403).json({ 
       success: false, 
       message: 'Admin tidak dapat dihapus' 
@@ -251,9 +295,18 @@ async function deleteUser(req, res) {
   }
 
   // Delete user
-  DUMMY_USERS.splice(userIndex, 1)
+  const deleteQuery = 'DELETE FROM users WHERE id = ?'
+  const result = await executeQuery(deleteQuery, [id])
 
-  console.log('✅ User deleted with dummy data')
+  if (!result.success) {
+    console.error('Delete user error:', result.error)
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal menghapus pengguna'
+    })
+  }
+
+  console.log('✅ User deleted from database')
 
   res.status(200).json({
     success: true,

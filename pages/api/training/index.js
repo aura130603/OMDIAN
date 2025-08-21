@@ -1,10 +1,4 @@
 import { executeQuery } from '../../../lib/db'
-import {
-  getFallbackTrainingData,
-  addFallbackTrainingData,
-  updateFallbackTrainingData,
-  deleteFallbackTrainingData
-} from './fallback'
 
 export default async function handler(req, res) {
   try {
@@ -40,14 +34,48 @@ async function getTrainingData(req, res) {
     })
   }
 
-  // Use dummy data only (no database connection)
-  const fallbackData = getFallbackTrainingData(userId, role)
+  let query = `
+    SELECT 
+      t.id,
+      t.user_id as userId,
+      t.tema,
+      t.penyelenggara,
+      DATE_FORMAT(t.tanggal_mulai, '%Y-%m-%d') as tanggalMulai,
+      DATE_FORMAT(t.tanggal_selesai, '%Y-%m-%d') as tanggalSelesai,
+      t.keterangan,
+      t.sertifikat,
+      t.created_at as createdAt,
+      u.nama,
+      u.nip
+    FROM training_data t
+    JOIN users u ON t.user_id = u.id
+  `
 
-  console.log('✅ Training data retrieved with dummy data')
+  let queryParams = []
+
+  // If not admin, only show own training data
+  if (role !== 'admin') {
+    query += ' WHERE t.user_id = ?'
+    queryParams.push(userId)
+  }
+
+  query += ' ORDER BY t.tanggal_mulai DESC'
+
+  const result = await executeQuery(query, queryParams)
+
+  if (!result.success) {
+    console.error('Database error:', result.error)
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal mengambil data pelatihan'
+    })
+  }
+
+  console.log('✅ Training data retrieved from database')
 
   res.status(200).json({
     success: true,
-    data: fallbackData
+    data: result.data
   })
 }
 
@@ -59,7 +87,8 @@ async function createTrainingData(req, res) {
     penyelenggara, 
     tanggalMulai, 
     tanggalSelesai, 
-    keterangan 
+    keterangan,
+    sertifikat
   } = req.body
 
   // Validation
@@ -78,22 +107,48 @@ async function createTrainingData(req, res) {
     })
   }
 
-  // Use dummy data (no database)
-  const result = addFallbackTrainingData({
-    user_id: userId,
+  // Verify user exists
+  const userCheck = await executeQuery('SELECT id FROM users WHERE id = ?', [userId])
+  if (!userCheck.success || userCheck.data.length === 0) {
+    return res.status(404).json({
+      success: false,
+      message: 'User tidak ditemukan'
+    })
+  }
+
+  // Insert training data
+  const insertQuery = `
+    INSERT INTO training_data (
+      user_id, tema, penyelenggara, tanggal_mulai, tanggal_selesai, keterangan, sertifikat
+    ) VALUES (?, ?, ?, ?, ?, ?, ?)
+  `
+
+  const insertParams = [
+    userId,
     tema,
     penyelenggara,
-    tanggal_mulai: tanggalMulai,
-    tanggal_selesai: tanggalSelesai,
-    keterangan
-  })
+    tanggalMulai,
+    tanggalSelesai,
+    keterangan || null,
+    sertifikat || null
+  ]
 
-  console.log('✅ Training data added with dummy data')
+  const result = await executeQuery(insertQuery, insertParams)
+
+  if (!result.success) {
+    console.error('Insert training error:', result.error)
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal menambahkan data pelatihan'
+    })
+  }
+
+  console.log('✅ Training data added to database')
 
   res.status(201).json({
     success: true,
     message: 'Data pelatihan berhasil ditambahkan',
-    data: result.data
+    data: { id: result.data.insertId }
   })
 }
 
@@ -105,7 +160,9 @@ async function updateTrainingData(req, res) {
     penyelenggara, 
     tanggalMulai, 
     tanggalSelesai, 
-    keterangan 
+    keterangan,
+    sertifikat,
+    userId
   } = req.body
 
   if (!id) {
@@ -123,23 +180,54 @@ async function updateTrainingData(req, res) {
     })
   }
 
-  // Use dummy data (no database)
-  const result = updateFallbackTrainingData(id, {
-    tema,
-    penyelenggara,
-    tanggal_mulai: tanggalMulai,
-    tanggal_selesai: tanggalSelesai,
-    keterangan
-  })
+  // Check if training exists and user has permission
+  let checkQuery = 'SELECT user_id FROM training_data WHERE id = ?'
+  let checkParams = [id]
 
-  if (!result.success) {
+  // If not admin, ensure user can only edit their own data
+  if (userId) {
+    checkQuery += ' AND user_id = ?'
+    checkParams.push(userId)
+  }
+
+  const existingTraining = await executeQuery(checkQuery, checkParams)
+
+  if (!existingTraining.success || existingTraining.data.length === 0) {
     return res.status(404).json({
       success: false,
-      message: result.message
+      message: 'Data pelatihan tidak ditemukan atau Anda tidak memiliki akses'
     })
   }
 
-  console.log('✅ Training data updated with dummy data')
+  // Update training data
+  const updateQuery = `
+    UPDATE training_data SET 
+      tema = ?, penyelenggara = ?, tanggal_mulai = ?, tanggal_selesai = ?, 
+      keterangan = ?, sertifikat = ?
+    WHERE id = ?
+  `
+
+  const updateParams = [
+    tema,
+    penyelenggara,
+    tanggalMulai,
+    tanggalSelesai,
+    keterangan || null,
+    sertifikat || null,
+    id
+  ]
+
+  const result = await executeQuery(updateQuery, updateParams)
+
+  if (!result.success) {
+    console.error('Update training error:', result.error)
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal memperbarui data pelatihan'
+    })
+  }
+
+  console.log('✅ Training data updated in database')
 
   res.status(200).json({
     success: true,
@@ -149,7 +237,7 @@ async function updateTrainingData(req, res) {
 
 // DELETE - Delete training data
 async function deleteTrainingData(req, res) {
-  const { id } = req.query
+  const { id, userId } = req.query
 
   if (!id) {
     return res.status(400).json({ 
@@ -158,17 +246,38 @@ async function deleteTrainingData(req, res) {
     })
   }
 
-  // Use dummy data (no database)
-  const result = deleteFallbackTrainingData(id)
+  // Check if training exists and user has permission
+  let checkQuery = 'SELECT user_id FROM training_data WHERE id = ?'
+  let checkParams = [id]
 
-  if (!result.success) {
+  // If not admin, ensure user can only delete their own data
+  if (userId) {
+    checkQuery += ' AND user_id = ?'
+    checkParams.push(userId)
+  }
+
+  const existingTraining = await executeQuery(checkQuery, checkParams)
+
+  if (!existingTraining.success || existingTraining.data.length === 0) {
     return res.status(404).json({
       success: false,
-      message: result.message
+      message: 'Data pelatihan tidak ditemukan atau Anda tidak memiliki akses'
     })
   }
 
-  console.log('✅ Training data deleted with dummy data')
+  // Delete training data
+  const deleteQuery = 'DELETE FROM training_data WHERE id = ?'
+  const result = await executeQuery(deleteQuery, [id])
+
+  if (!result.success) {
+    console.error('Delete training error:', result.error)
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal menghapus data pelatihan'
+    })
+  }
+
+  console.log('✅ Training data deleted from database')
 
   res.status(200).json({
     success: true,

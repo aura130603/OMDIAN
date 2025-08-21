@@ -10,6 +10,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@builder.io/react": "^8.2.6",
+    "@builder.io/sdk": "^6.1.2",
     "bcryptjs": "^3.0.2",
     "mysql2": "^3.14.3",
     "next": "latest",

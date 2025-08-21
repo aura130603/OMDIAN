@@ -1,8 +1,9 @@
 {
   "/_app": "pages/_app.js",
-  "/_document": "pages/_document.js",
   "/_error": "pages/_error.js",
-  "/dashboard": "pages/dashboard.js",
-  "/employee-management": "pages/employee-management.js",
-  "/statistics": "pages/statistics.js"
+  "/_document": "pages/_document.js",
+  "/": "pages/index.js",
+  "/statistics": "pages/statistics.js",
+  "/api/training": "pages/api/training.js",
+  "/dashboard": "pages/dashboard.js"
 }

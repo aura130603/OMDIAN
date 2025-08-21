@@ -12,6 +12,8 @@ export default function TrainingModal({ training, onSave, onClose }) {
     sertifikat: null,
     statusSertifikat: 'belum_upload' // belum_upload, sudah_upload
   })
+  const [uploadedFile, setUploadedFile] = useState(null)
+  const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -26,6 +28,17 @@ export default function TrainingModal({ training, onSave, onClose }) {
         sertifikat: training.sertifikat || null,
         statusSertifikat: training.sertifikat ? 'sudah_upload' : 'belum_upload'
       })
+
+      // Set uploaded file info if certificate exists
+      if (training.sertifikat) {
+        setUploadedFile({
+          name: training.sertifikat.split('/').pop(),
+          path: training.sertifikat,
+          size: 0 // Size unknown for existing files
+        })
+      } else {
+        setUploadedFile(null)
+      }
     }
   }, [training])
 
@@ -37,16 +50,58 @@ export default function TrainingModal({ training, onSave, onClose }) {
     if (error) setError('')
   }
 
-  const handleFileChange = (e) => {
+  const handleFileChange = async (e) => {
     const file = e.target.files[0]
-    if (file) {
-      // In a real application, you would upload the file to a server
-      // For demo purposes, we'll just store the filename
-      setFormData({
-        ...formData,
-        sertifikat: file.name,
-        statusSertifikat: 'sudah_upload'
+    if (!file) return
+
+    try {
+      setUploading(true)
+      setError('')
+
+      // Validate file type and size
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf']
+      if (!allowedTypes.includes(file.type)) {
+        setError('File harus berformat JPG, PNG, atau PDF')
+        setUploading(false)
+        return
+      }
+
+      if (file.size > 5 * 1024 * 1024) { // 5MB
+        setError('Ukuran file maksimal 5MB')
+        setUploading(false)
+        return
+      }
+
+      // Upload file to server
+      const formData = new FormData()
+      formData.append('certificate', file)
+
+      const response = await fetch('/api/upload-certificate', {
+        method: 'POST',
+        body: formData
       })
+
+      const result = await response.json()
+
+      if (result.success) {
+        setFormData(prev => ({
+          ...prev,
+          sertifikat: result.filePath,
+          statusSertifikat: 'sudah_upload'
+        }))
+        setUploadedFile({
+          name: result.originalName,
+          path: result.filePath,
+          size: result.size
+        })
+      } else {
+        setError(result.message || 'Gagal mengupload file')
+      }
+    } catch (error) {
+      console.error('File upload error:', error)
+      setError('Terjadi kesalahan saat mengupload file')
+    } finally {
+      setUploading(false)
     }
   }
 
@@ -208,15 +263,38 @@ export default function TrainingModal({ training, onSave, onClose }) {
                 name="sertifikat"
                 accept=".pdf,.jpg,.jpeg,.png"
                 onChange={handleFileChange}
+                disabled={uploading}
                 style={{ display: 'none' }}
               />
-              <label htmlFor="sertifikat" style={{ cursor: 'pointer', width: '100%', display: 'block' }}>
+              <label
+                htmlFor="sertifikat"
+                style={{
+                  cursor: uploading ? 'not-allowed' : 'pointer',
+                  width: '100%',
+                  display: 'block',
+                  opacity: uploading ? 0.6 : 1
+                }}
+              >
                 <div className="file-upload-text">
-                  {formData.sertifikat ? (
+                  {uploading ? (
                     <>
-                      📄 {formData.sertifikat}
+                      ⏳ Mengupload file...
                       <br />
-                      <small style={{ color: 'var(--success)' }}>✓ File sudah dipilih - Klik untuk mengganti</small>
+                      <small style={{ color: 'var(--primary-medium)' }}>Mohon tunggu sebentar</small>
+                    </>
+                  ) : uploadedFile ? (
+                    <>
+                      📄 {uploadedFile.name}
+                      <br />
+                      <small style={{ color: 'var(--success)' }}>
+                        ✓ File berhasil diupload ({(uploadedFile.size / 1024).toFixed(1)} KB) - Klik untuk mengganti
+                      </small>
+                    </>
+                  ) : formData.sertifikat ? (
+                    <>
+                      📄 {formData.sertifikat.split('/').pop()}
+                      <br />
+                      <small style={{ color: 'var(--success)' }}>✓ File sudah tersimpan - Klik untuk mengganti</small>
                     </>
                   ) : (
                     <>

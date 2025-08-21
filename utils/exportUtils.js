@@ -168,18 +168,20 @@ const calculateDuration = (startDate, endDate) => {
 }
 
 // Certificate viewing functionality
-export const viewCertificate = (certificateFilename) => {
-  if (!certificateFilename) {
+export const viewCertificate = (certificatePath) => {
+  if (!certificatePath) {
     alert('Sertifikat tidak tersedia')
     return
   }
 
-  // In a real application, this would open the actual certificate file
-  // For demo purposes, we'll show a modal or alert
-  alert(`Menampilkan sertifikat: ${certificateFilename}\n\nCatatan: Dalam implementasi nyata, ini akan membuka file sertifikat yang telah diupload.`)
-
-  // Real implementation would be something like:
-  // window.open(`/api/certificates/${certificateFilename}`, '_blank')
+  try {
+    // Open the certificate file in a new tab
+    const fileUrl = certificatePath.startsWith('http') ? certificatePath : certificatePath
+    window.open(fileUrl, '_blank')
+  } catch (error) {
+    console.error('Error opening certificate:', error)
+    alert('Gagal membuka sertifikat. File mungkin sudah tidak tersedia.')
+  }
 }
 
 // Generate summary statistics for reports

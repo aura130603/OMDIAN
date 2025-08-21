@@ -51,7 +51,7 @@ async function getTrainingData(req, res) {
       DATE_FORMAT(t.tanggal_mulai, '%Y-%m-%d') as tanggalMulai,
       DATE_FORMAT(t.tanggal_selesai, '%Y-%m-%d') as tanggalSelesai,
       t.keterangan,
-      NULL as sertifikat,
+      t.sertifikat,
       t.created_at as createdAt,
       u.nama as pegawaiNama,
       u.nip as pegawaiNIP
@@ -124,11 +124,11 @@ async function createTrainingData(req, res) {
     })
   }
 
-  // Insert training data (without sertifikat column for now)
+  // Insert training data with certificate support
   const insertQuery = `
     INSERT INTO training_data (
-      user_id, tema, penyelenggara, tanggal_mulai, tanggal_selesai, keterangan
-    ) VALUES (?, ?, ?, ?, ?, ?)
+      user_id, tema, penyelenggara, tanggal_mulai, tanggal_selesai, keterangan, sertifikat
+    ) VALUES (?, ?, ?, ?, ?, ?, ?)
   `
 
   const insertParams = [
@@ -137,7 +137,8 @@ async function createTrainingData(req, res) {
     penyelenggara,
     tanggalMulai,
     tanggalSelesai,
-    keterangan || null
+    keterangan || null,
+    sertifikat || null
   ]
 
   const result = await executeQuery(insertQuery, insertParams)
@@ -206,11 +207,11 @@ async function updateTrainingData(req, res) {
     })
   }
 
-  // Update training data (without sertifikat column for now)
+  // Update training data with certificate support
   const updateQuery = `
     UPDATE training_data SET
       tema = ?, penyelenggara = ?, tanggal_mulai = ?, tanggal_selesai = ?,
-      keterangan = ?
+      keterangan = ?, sertifikat = ?
     WHERE id = ?
   `
 
@@ -220,6 +221,7 @@ async function updateTrainingData(req, res) {
     tanggalMulai,
     tanggalSelesai,
     keterangan || null,
+    sertifikat || null,
     id
   ]
 

@@ -7,7 +7,25 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { username, password } = req.body
+    let username, password;
+
+    // Handle both JSON and form-encoded data
+    if (req.headers['content-type']?.includes('application/json')) {
+      ({ username, password } = req.body);
+    } else {
+      // Handle form-encoded data
+      const body = req.body;
+      username = body.username || body['"username'] || body['username"'] || body['"username"'];
+      password = body.password || body['"password'] || body['password"'] || body['"password"'];
+
+      // Clean up quotes if present
+      if (username && username.includes('"')) {
+        username = username.replace(/"/g, '');
+      }
+      if (password && password.includes('"')) {
+        password = password.replace(/"/g, '');
+      }
+    }
 
     if (!username || !password) {
       return res.status(400).json({

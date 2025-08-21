@@ -7,20 +7,35 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { 
-      username, 
-      password, 
-      nip, 
-      nama, 
-      pangkat, 
-      golongan, 
-      jabatan, 
-      pendidikan, 
-      nilaiSKP,
-      hukumanDisiplin,
-      diklatPIM,
-      diklatFungsional 
-    } = req.body
+    let username, password, nip, nama, pangkat, golongan, jabatan, pendidikan, nilaiSKP, hukumanDisiplin, diklatPIM, diklatFungsional;
+
+    // Handle both JSON and form-encoded data
+    if (req.headers['content-type']?.includes('application/json')) {
+      ({ username, password, nip, nama, pangkat, golongan, jabatan, pendidikan, nilaiSKP, hukumanDisiplin, diklatPIM, diklatFungsional } = req.body);
+    } else {
+      // Handle form-encoded data
+      const body = req.body;
+      const cleanValue = (key) => {
+        let value = body[key] || body[`"${key}`] || body[`${key}"`] || body[`"${key}"`];
+        if (value && value.includes('"')) {
+          value = value.replace(/"/g, '');
+        }
+        return value;
+      };
+
+      username = cleanValue('username');
+      password = cleanValue('password');
+      nip = cleanValue('nip');
+      nama = cleanValue('nama');
+      pangkat = cleanValue('pangkat');
+      golongan = cleanValue('golongan');
+      jabatan = cleanValue('jabatan');
+      pendidikan = cleanValue('pendidikan');
+      nilaiSKP = cleanValue('nilaiSKP');
+      hukumanDisiplin = cleanValue('hukumanDisiplin');
+      diklatPIM = cleanValue('diklatPIM');
+      diklatFungsional = cleanValue('diklatFungsional');
+    }
 
     // Validation
     if (!username || !password || !nip || !nama || !pangkat || !golongan || !jabatan || !pendidikan) {

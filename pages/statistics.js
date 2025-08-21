@@ -53,7 +53,7 @@ export default function Statistics() {
       return year === currentYear
     })
 
-    const employeesWithTraining = new Set(thisYearTraining.map(t => t.pegawaiId)).size
+    const employeesWithTraining = new Set(thisYearTraining.map(t => t.userId)).size
     const employeesWithoutTraining = allUsers.length - employeesWithTraining
 
     return {
@@ -350,7 +350,7 @@ export default function Statistics() {
                   </thead>
                   <tbody>
                     {allUsers.map((pegawai) => {
-                      const employeeTraining = allTraining.filter(t => t.pegawaiId === pegawai.id)
+                      const employeeTraining = allTraining.filter(t => t.userId === pegawai.id)
                       const thisYearCount = employeeTraining.filter(t => {
                         const year = new Date(t.tanggalMulai).getFullYear()
                         return year === currentYear

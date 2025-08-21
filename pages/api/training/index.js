@@ -1,5 +1,13 @@
 import { executeQuery } from '../../../lib/db'
 
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '1mb',
+    },
+  },
+}
+
 export default async function handler(req, res) {
   try {
     switch (req.method) {
@@ -35,7 +43,7 @@ async function getTrainingData(req, res) {
   }
 
   let query = `
-    SELECT 
+    SELECT
       t.id,
       t.user_id as userId,
       t.tema,
@@ -43,10 +51,10 @@ async function getTrainingData(req, res) {
       DATE_FORMAT(t.tanggal_mulai, '%Y-%m-%d') as tanggalMulai,
       DATE_FORMAT(t.tanggal_selesai, '%Y-%m-%d') as tanggalSelesai,
       t.keterangan,
-      t.sertifikat,
+      NULL as sertifikat,
       t.created_at as createdAt,
-      u.nama,
-      u.nip
+      u.nama as pegawaiNama,
+      u.nip as pegawaiNIP
     FROM training_data t
     JOIN users u ON t.user_id = u.id
   `
@@ -81,21 +89,21 @@ async function getTrainingData(req, res) {
 
 // POST - Create new training data
 async function createTrainingData(req, res) {
-  const { 
-    userId, 
-    tema, 
-    penyelenggara, 
-    tanggalMulai, 
-    tanggalSelesai, 
+  const {
+    userId,
+    tema,
+    penyelenggara,
+    tanggalMulai,
+    tanggalSelesai,
     keterangan,
     sertifikat
   } = req.body
 
   // Validation
   if (!userId || !tema || !penyelenggara || !tanggalMulai || !tanggalSelesai) {
-    return res.status(400).json({ 
-      success: false, 
-      message: 'Semua field wajib diisi' 
+    return res.status(400).json({
+      success: false,
+      message: 'Semua field wajib diisi'
     })
   }
 
@@ -116,11 +124,11 @@ async function createTrainingData(req, res) {
     })
   }
 
-  // Insert training data
+  // Insert training data (without sertifikat column for now)
   const insertQuery = `
     INSERT INTO training_data (
-      user_id, tema, penyelenggara, tanggal_mulai, tanggal_selesai, keterangan, sertifikat
-    ) VALUES (?, ?, ?, ?, ?, ?, ?)
+      user_id, tema, penyelenggara, tanggal_mulai, tanggal_selesai, keterangan
+    ) VALUES (?, ?, ?, ?, ?, ?)
   `
 
   const insertParams = [
@@ -129,8 +137,7 @@ async function createTrainingData(req, res) {
     penyelenggara,
     tanggalMulai,
     tanggalSelesai,
-    keterangan || null,
-    sertifikat || null
+    keterangan || null
   ]
 
   const result = await executeQuery(insertQuery, insertParams)
@@ -199,11 +206,11 @@ async function updateTrainingData(req, res) {
     })
   }
 
-  // Update training data
+  // Update training data (without sertifikat column for now)
   const updateQuery = `
-    UPDATE training_data SET 
-      tema = ?, penyelenggara = ?, tanggal_mulai = ?, tanggal_selesai = ?, 
-      keterangan = ?, sertifikat = ?
+    UPDATE training_data SET
+      tema = ?, penyelenggara = ?, tanggal_mulai = ?, tanggal_selesai = ?,
+      keterangan = ?
     WHERE id = ?
   `
 
@@ -213,7 +220,6 @@ async function updateTrainingData(req, res) {
     tanggalMulai,
     tanggalSelesai,
     keterangan || null,
-    sertifikat || null,
     id
   ]
 

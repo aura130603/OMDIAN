@@ -290,7 +290,7 @@ export default function EmployeeManagement() {
                     {filteredEmployees.map((pegawai) => {
                       const thisYearCount = allTraining.filter(t => {
                         const year = new Date(t.tanggalMulai).getFullYear()
-                        return t.pegawaiId === pegawai.id && year === currentYear
+                        return t.userId === pegawai.id && year === currentYear
                       }).length
 
                       return (

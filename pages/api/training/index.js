@@ -33,7 +33,7 @@ export default async function handler(req, res) {
 
 // GET - Retrieve training data
 async function getTrainingData(req, res) {
-  const { userId, role } = req.query
+  const { userId, role, year } = req.query
 
   if (!userId || !role) {
     return res.status(400).json({
@@ -60,11 +60,23 @@ async function getTrainingData(req, res) {
   `
 
   let queryParams = []
+  let whereConditions = []
 
   // If not admin, only show own training data
   if (role !== 'admin') {
-    query += ' WHERE t.user_id = ?'
+    whereConditions.push('t.user_id = ?')
     queryParams.push(userId)
+  }
+
+  // Add year filter if specified
+  if (year && year !== 'all') {
+    whereConditions.push('YEAR(t.tanggal_mulai) = ?')
+    queryParams.push(parseInt(year))
+  }
+
+  // Add WHERE clause if there are conditions
+  if (whereConditions.length > 0) {
+    query += ' WHERE ' + whereConditions.join(' AND ')
   }
 
   query += ' ORDER BY t.tanggal_mulai DESC'
@@ -79,7 +91,7 @@ async function getTrainingData(req, res) {
     })
   }
 
-  console.log('✅ Training data retrieved from database')
+  console.log('✅ Training data retrieved from database', year ? `for year ${year}` : 'for all years')
 
   res.status(200).json({
     success: true,

@@ -955,7 +955,7 @@ a {
 
 .bar-chart {
   display: flex;
-  gap: 20px;
+  gap: 15px;
   align-items: end;
   justify-content: center;
   height: 120px;
@@ -1063,4 +1063,32 @@ a {
     grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
     gap: 15px;
   }
+}
+
+/* Year Filter Styles */
+.year-filter-container {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.year-filter-select {
+  min-width: 150px;
+  padding: 8px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background-color: var(--white);
+  color: var(--text-dark);
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.year-filter-select:focus {
+  outline: none;
+  border-color: var(--primary-medium);
+  box-shadow: 0 0 0 3px rgba(203, 210, 164, 0.2);
+}
+
+.year-filter-select:hover {
+  border-color: var(--primary-dark);
 }

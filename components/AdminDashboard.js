@@ -1,6 +1,7 @@
 import { useState, useContext, useEffect } from 'react'
 import { AuthContext } from '../context/AuthContext'
 import ProfileDropdown from './ProfileDropdown'
+import YearFilter from './YearFilter'
 
 export default function AdminDashboard({ user }) {
   const { logout, getAllUsers, getAllTrainingData, deleteTrainingData } = useContext(AuthContext)
@@ -8,21 +9,31 @@ export default function AdminDashboard({ user }) {
   const [allUsers, setAllUsers] = useState([])
   const [allTraining, setAllTraining] = useState([])
   const [searchTerm, setSearchTerm] = useState('')
+  const [selectedYear, setSelectedYear] = useState(null)
 
   useEffect(() => {
     if (user && user.role === 'admin') {
-      const users = getAllUsers()
-      const training = getAllTrainingData()
-      setAllUsers(users)
-      setAllTraining(training)
+      const loadData = async () => {
+        try {
+          const users = await getAllUsers()
+          const training = await getAllTrainingData(selectedYear)
+          setAllUsers(users)
+          setAllTraining(training)
+        } catch (error) {
+          console.error('Error loading admin data:', error)
+          setAllUsers([])
+          setAllTraining([])
+        }
+      }
+      loadData()
     }
-  }, [user, getAllUsers, getAllTrainingData])
+  }, [user, selectedYear, getAllUsers, getAllTrainingData])
 
   const handleDeleteTraining = async (trainingId) => {
     if (window.confirm('Apakah Anda yakin ingin menghapus data pelatihan ini?')) {
       const result = await deleteTrainingData(trainingId)
       if (result.success) {
-        const updatedTraining = getAllTrainingData()
+        const updatedTraining = await getAllTrainingData(selectedYear)
         setAllTraining(updatedTraining)
       }
     }
@@ -266,13 +277,19 @@ export default function AdminDashboard({ user }) {
             {/* Training Tab */}
             {activeTab === 'training' && (
               <div>
-                <div style={{ 
-                  display: 'flex', 
-                  justifyContent: 'space-between', 
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
                   alignItems: 'center',
                   marginBottom: '20px'
                 }}>
-                  <h2 className="card-title">Data Pelatihan ({filteredTraining.length})</h2>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                    <h2 className="card-title">Data Pelatihan ({filteredTraining.length})</h2>
+                    <YearFilter
+                      selectedYear={selectedYear}
+                      onYearChange={setSelectedYear}
+                    />
+                  </div>
                   <input
                     type="text"
                     placeholder="Cari tema, penyelenggara, atau nama pegawai..."

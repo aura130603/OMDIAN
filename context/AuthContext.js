@@ -123,9 +123,14 @@ export const AuthProvider = ({ children }) => {
     }
   }
 
-  const getUserTrainingData = async (userId) => {
+  const getUserTrainingData = async (userId, year = null) => {
     try {
-      const response = await fetch(`/api/training?userId=${userId}&role=${user.role}`, {
+      let url = `/api/training?userId=${userId}&role=${user.role}`
+      if (year !== null) {
+        url += `&year=${year}`
+      }
+
+      const response = await fetch(url, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -140,13 +145,18 @@ export const AuthProvider = ({ children }) => {
     }
   }
 
-  const getAllTrainingData = async () => {
+  const getAllTrainingData = async (year = null) => {
     if (!user || user.role !== 'admin') {
       return []
     }
 
     try {
-      const response = await fetch(`/api/training?userId=${user.id}&role=${user.role}`, {
+      let url = `/api/training?userId=${user.id}&role=${user.role}`
+      if (year !== null) {
+        url += `&year=${year}`
+      }
+
+      const response = await fetch(url, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

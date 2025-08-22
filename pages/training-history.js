@@ -3,6 +3,7 @@ import { useRouter } from 'next/router'
 import { AuthContext } from '../context/AuthContext'
 import ProfileDropdown from '../components/ProfileDropdown'
 import TrainingModal from '../components/TrainingModal'
+import YearFilter from '../components/YearFilter'
 import { viewCertificate } from '../utils/exportUtils'
 
 export default function TrainingHistory() {
@@ -12,6 +13,7 @@ export default function TrainingHistory() {
   const [showModal, setShowModal] = useState(false)
   const [editingTraining, setEditingTraining] = useState(null)
   const [searchTerm, setSearchTerm] = useState('')
+  const [selectedYear, setSelectedYear] = useState(null)
 
   useEffect(() => {
     if (!loading && !user) {
@@ -24,10 +26,10 @@ export default function TrainingHistory() {
       const loadTrainingData = async () => {
         try {
           if (user.role === 'admin') {
-            const data = await getAllTrainingData()
+            const data = await getAllTrainingData(selectedYear)
             setTrainingData(data)
           } else {
-            const data = await getUserTrainingData(user.id)
+            const data = await getUserTrainingData(user.id, selectedYear)
             setTrainingData(data)
           }
         } catch (error) {
@@ -37,7 +39,7 @@ export default function TrainingHistory() {
       }
       loadTrainingData()
     }
-  }, [user, getUserTrainingData, getAllTrainingData])
+  }, [user, selectedYear, getUserTrainingData, getAllTrainingData])
 
   const handleAddTraining = () => {
     setEditingTraining(null)
@@ -54,10 +56,10 @@ export default function TrainingHistory() {
       const result = await deleteTrainingData(trainingId)
       if (result.success) {
         if (user.role === 'admin') {
-          const updatedData = await getAllTrainingData()
+          const updatedData = await getAllTrainingData(selectedYear)
           setTrainingData(updatedData)
         } else {
-          const updatedData = await getUserTrainingData(user.id)
+          const updatedData = await getUserTrainingData(user.id, selectedYear)
           setTrainingData(updatedData)
         }
       }
@@ -69,10 +71,10 @@ export default function TrainingHistory() {
       const result = await updateTrainingData(editingTraining.id, formData)
       if (result.success) {
         if (user.role === 'admin') {
-          const updatedData = await getAllTrainingData()
+          const updatedData = await getAllTrainingData(selectedYear)
           setTrainingData(updatedData)
         } else {
-          const updatedData = await getUserTrainingData(user.id)
+          const updatedData = await getUserTrainingData(user.id, selectedYear)
           setTrainingData(updatedData)
         }
         setShowModal(false)
@@ -81,10 +83,10 @@ export default function TrainingHistory() {
       const result = await addTrainingData(formData)
       if (result.success) {
         if (user.role === 'admin') {
-          const updatedData = await getAllTrainingData()
+          const updatedData = await getAllTrainingData(selectedYear)
           setTrainingData(updatedData)
         } else {
-          const updatedData = await getUserTrainingData(user.id)
+          const updatedData = await getUserTrainingData(user.id, selectedYear)
           setTrainingData(updatedData)
         }
         setShowModal(false)
@@ -164,9 +166,13 @@ export default function TrainingHistory() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
                   <h2 className="card-title">
-                    {user.role === 'admin' ? 'Semua Data Pelatihan' : 'Riwayat Pelatihan Anda'} 
+                    {user.role === 'admin' ? 'Semua Data Pelatihan' : 'Riwayat Pelatihan Anda'}
                     ({filteredTrainingData.length})
                   </h2>
+                  <YearFilter
+                    selectedYear={selectedYear}
+                    onYearChange={setSelectedYear}
+                  />
                   <input
                     type="text"
                     placeholder="Cari pelatihan..."

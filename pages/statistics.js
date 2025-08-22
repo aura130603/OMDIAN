@@ -53,7 +53,13 @@ export default function Statistics() {
       return year === currentYear
     })
 
-    const employeesWithTraining = new Set(thisYearTraining.map(t => t.userId)).size
+    // Get employees with training in the last 3 years for better completion rate
+    const lastThreeYearsTraining = allTraining.filter(t => {
+      const year = new Date(t.tanggalMulai).getFullYear()
+      return year >= currentYear - 2 && year <= currentYear
+    })
+
+    const employeesWithTraining = new Set(lastThreeYearsTraining.map(t => t.userId)).size
     const employeesWithoutTraining = allUsers.length - employeesWithTraining
 
     return {
@@ -83,6 +89,27 @@ export default function Statistics() {
       certificateRate: userTraining.length > 0 ? ((userTraining.filter(t => t.sertifikat).length / userTraining.length) * 100).toFixed(1) : 0,
       uniqueOrganizers: [...new Set(userTraining.map(t => t.penyelenggara))].length
     }
+  }
+
+  const getTrainingByYears = (trainingData, yearsCount = 3) => {
+    const currentYear = new Date().getFullYear()
+    const yearData = []
+
+    for (let i = yearsCount - 1; i >= 0; i--) {
+      const year = currentYear - i
+      const yearTraining = trainingData.filter(t => {
+        const trainingYear = new Date(t.tanggalMulai).getFullYear()
+        return trainingYear === year
+      })
+
+      yearData.push({
+        year: year,
+        count: yearTraining.length,
+        trainings: yearTraining
+      })
+    }
+
+    return yearData
   }
 
   const handleExportEmployeeReport = () => {
@@ -192,7 +219,7 @@ export default function Statistics() {
                     <span className="profile-value">{stats.thisYearTraining} kegiatan</span>
                   </div>
                   <div className="profile-item">
-                    <span className="profile-label">Pegawai Sudah Isi</span>
+                    <span className="profile-label">Pegawai Aktif (3 Tahun)</span>
                     <span className="profile-value">{stats.employeesWithTraining} dari {stats.totalEmployees}</span>
                   </div>
                   <div className="profile-item">
@@ -218,6 +245,16 @@ export default function Statistics() {
                   <div className="profile-item">
                     <span className="profile-label">Penyelenggara Unik</span>
                     <span className="profile-value">{stats.uniqueOrganizers} lembaga</span>
+                  </div>
+                  <div className="profile-item">
+                    <span className="profile-label">Total 3 Tahun Terakhir</span>
+                    <span className="profile-value">
+                      {(() => {
+                        const yearlyData = getTrainingByYears(allTraining, 3)
+                        const total = yearlyData.reduce((sum, year) => sum + year.count, 0)
+                        return `${total} kegiatan`
+                      })()}
+                    </span>
                   </div>
                 </>
               ) : (
@@ -249,7 +286,11 @@ export default function Statistics() {
                   <div className="profile-item">
                     <span className="profile-label">Rata-rata per Tahun</span>
                     <span className="profile-value">
-                      {stats.totalTraining > 0 ? (stats.totalTraining / Math.max(1, currentYear - 2020)).toFixed(1) : 0} kegiatan
+                      {(() => {
+                        const yearlyData = getTrainingByYears(userTraining, 3)
+                        const totalLastThreeYears = yearlyData.reduce((sum, year) => sum + year.count, 0)
+                        return (totalLastThreeYears / 3).toFixed(1)
+                      })()} kegiatan
                     </span>
                   </div>
                 </>
@@ -287,39 +328,137 @@ export default function Statistics() {
               </div>
 
               <div className="progress-chart">
-                <div className="chart-title">Pelatihan per Tahun</div>
+                <div className="chart-title">Pelatihan per Tahun (3 Tahun Terakhir)</div>
                 <div className="chart-container">
                   <div className="bar-chart">
-                    <div className="bar-item">
-                      <div className="bar-label">{currentYear - 1}</div>
-                      <div className="bar-container">
-                        <div 
-                          className="bar-fill"
-                          style={{ 
-                            height: user.role === 'admin' 
-                              ? `${Math.min(100, (stats.totalTraining - stats.thisYearTraining) / Math.max(1, stats.totalTraining) * 100)}%`
-                              : `${Math.min(100, (stats.totalTraining - stats.thisYearTraining) / Math.max(1, stats.totalTraining) * 100)}%`
-                          }}
-                        ></div>
-                      </div>
-                      <div className="bar-value">
-                        {user.role === 'admin' ? stats.totalTraining - stats.thisYearTraining : stats.totalTraining - stats.thisYearTraining}
-                      </div>
-                    </div>
-                    <div className="bar-item">
-                      <div className="bar-label">{currentYear}</div>
-                      <div className="bar-container">
-                        <div 
-                          className="bar-fill active"
-                          style={{ 
-                            height: `${Math.min(100, stats.thisYearTraining / Math.max(1, stats.totalTraining) * 100)}%`
-                          }}
-                        ></div>
-                      </div>
-                      <div className="bar-value">{stats.thisYearTraining}</div>
-                    </div>
+                    {(() => {
+                      const trainingData = user.role === 'admin' ? allTraining : userTraining
+                      const yearlyData = getTrainingByYears(trainingData, 3)
+                      const maxCount = Math.max(...yearlyData.map(d => d.count), 1)
+
+                      return yearlyData.map((yearInfo, index) => (
+                        <div key={yearInfo.year} className="bar-item">
+                          <div className="bar-label">{yearInfo.year}</div>
+                          <div className="bar-container">
+                            <div
+                              className={`bar-fill ${index === yearlyData.length - 1 ? 'active' : ''}`}
+                              style={{
+                                height: `${Math.min(100, (yearInfo.count / maxCount) * 100)}%`
+                              }}
+                            ></div>
+                          </div>
+                          <div className="bar-value">{yearInfo.count}</div>
+                        </div>
+                      ))
+                    })()}
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Yearly Breakdown Card */}
+          <div className="card">
+            <div className="card-header">
+              <h2 className="card-title">Rincian Pelatihan 3 Tahun Terakhir</h2>
+            </div>
+
+            <div className="profile-grid">
+              {(() => {
+                const trainingData = user.role === 'admin' ? allTraining : userTraining
+                const yearlyData = getTrainingByYears(trainingData, 3)
+
+                return yearlyData.map((yearInfo) => {
+                  const withCertificates = yearInfo.trainings.filter(t => t.sertifikat).length
+                  const certificateRate = yearInfo.count > 0 ? ((withCertificates / yearInfo.count) * 100).toFixed(1) : 0
+
+                  return (
+                    <div key={yearInfo.year} className="profile-item">
+                      <span className="profile-label">
+                        Tahun {yearInfo.year}
+                        {yearInfo.year === currentYear && (
+                          <span style={{
+                            marginLeft: '8px',
+                            fontSize: '10px',
+                            color: 'var(--primary-dark)',
+                            fontWeight: 'bold'
+                          }}>
+                            (AKTIF)
+                          </span>
+                        )}
+                      </span>
+                      <span className="profile-value">
+                        <div style={{ textAlign: 'right' }}>
+                          <div style={{ fontWeight: 'bold', color: 'var(--primary-darkest)' }}>
+                            {yearInfo.count} kegiatan
+                          </div>
+                          <div style={{ fontSize: '12px', color: 'var(--text-medium)' }}>
+                            {withCertificates} bersertifikat ({certificateRate}%)
+                          </div>
+                        </div>
+                      </span>
+                    </div>
+                  )
+                })
+              })()}
+
+              <div className="profile-item">
+                <span className="profile-label">Total 3 Tahun</span>
+                <span className="profile-value">
+                  {(() => {
+                    const trainingData = user.role === 'admin' ? allTraining : userTraining
+                    const yearlyData = getTrainingByYears(trainingData, 3)
+                    const total = yearlyData.reduce((sum, year) => sum + year.count, 0)
+                    const avgPerYear = (total / 3).toFixed(1)
+                    return (
+                      <div style={{ textAlign: 'right' }}>
+                        <div style={{ fontWeight: 'bold', color: 'var(--primary-darkest)' }}>
+                          {total} kegiatan
+                        </div>
+                        <div style={{ fontSize: '12px', color: 'var(--text-medium)' }}>
+                          Rata-rata: {avgPerYear}/tahun
+                        </div>
+                      </div>
+                    )
+                  })()}
+                </span>
+              </div>
+
+              <div className="profile-item">
+                <span className="profile-label">Trend Pelatihan</span>
+                <span className="profile-value">
+                  {(() => {
+                    const trainingData = user.role === 'admin' ? allTraining : userTraining
+                    const yearlyData = getTrainingByYears(trainingData, 3)
+                    const lastYear = yearlyData[yearlyData.length - 1]?.count || 0
+                    const previousYear = yearlyData[yearlyData.length - 2]?.count || 0
+
+                    let trend = 'Stabil'
+                    let trendColor = 'var(--text-medium)'
+                    let trendIcon = '➡️'
+
+                    if (lastYear > previousYear) {
+                      trend = 'Meningkat'
+                      trendColor = 'var(--success)'
+                      trendIcon = '📈'
+                    } else if (lastYear < previousYear) {
+                      trend = 'Menurun'
+                      trendColor = 'var(--warning)'
+                      trendIcon = '📉'
+                    }
+
+                    return (
+                      <div style={{ textAlign: 'right', color: trendColor }}>
+                        <div style={{ fontWeight: 'bold' }}>
+                          {trendIcon} {trend}
+                        </div>
+                        <div style={{ fontSize: '12px' }}>
+                          {lastYear} vs {previousYear} (tahun lalu)
+                        </div>
+                      </div>
+                    )
+                  })()}
+                </span>
               </div>
             </div>
           </div>

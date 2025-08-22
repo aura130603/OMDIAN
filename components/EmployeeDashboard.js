@@ -2,19 +2,29 @@ import { useState, useContext, useEffect } from 'react'
 import { AuthContext } from '../context/AuthContext'
 import TrainingModal from './TrainingModal'
 import ProfileDropdown from './ProfileDropdown'
+import YearFilter from './YearFilter'
 
 export default function EmployeeDashboard({ user }) {
   const { logout, getUserTrainingData, addTrainingData, updateTrainingData } = useContext(AuthContext)
   const [trainingData, setTrainingData] = useState([])
   const [showModal, setShowModal] = useState(false)
   const [editingTraining, setEditingTraining] = useState(null)
+  const [selectedYear, setSelectedYear] = useState(null)
 
   useEffect(() => {
     if (user) {
-      const data = getUserTrainingData(user.id)
-      setTrainingData(data)
+      const loadTrainingData = async () => {
+        try {
+          const data = await getUserTrainingData(user.id, selectedYear)
+          setTrainingData(data)
+        } catch (error) {
+          console.error('Error loading training data:', error)
+          setTrainingData([])
+        }
+      }
+      loadTrainingData()
     }
-  }, [user, getUserTrainingData])
+  }, [user, selectedYear, getUserTrainingData])
 
   const handleAddTraining = () => {
     setEditingTraining(null)
@@ -30,14 +40,14 @@ export default function EmployeeDashboard({ user }) {
     if (editingTraining) {
       const result = await updateTrainingData(editingTraining.id, formData)
       if (result.success) {
-        const updatedData = getUserTrainingData(user.id)
+        const updatedData = await getUserTrainingData(user.id, selectedYear)
         setTrainingData(updatedData)
         setShowModal(false)
       }
     } else {
       const result = await addTrainingData(formData)
       if (result.success) {
-        const updatedData = getUserTrainingData(user.id)
+        const updatedData = await getUserTrainingData(user.id, selectedYear)
         setTrainingData(updatedData)
         setShowModal(false)
       }
@@ -73,10 +83,18 @@ export default function EmployeeDashboard({ user }) {
           {/* Training History Card */}
           <div className="card">
             <div className="card-header">
-              <h2 className="card-title">Riwayat Diklat/Workshop/Seminar</h2>
-              <button className="btn-add" onClick={handleAddTraining}>
-                + Tambah Data
-              </button>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                  <h2 className="card-title">Riwayat Diklat/Workshop/Seminar</h2>
+                  <YearFilter
+                    selectedYear={selectedYear}
+                    onYearChange={setSelectedYear}
+                  />
+                </div>
+                <button className="btn-add" onClick={handleAddTraining}>
+                  + Tambah Data
+                </button>
+              </div>
             </div>
             
             {trainingData.length === 0 ? (

@@ -24,9 +24,9 @@ export default function YearFilter({ selectedYear, onYearChange, showAllOption =
 
   return (
     <div className="year-filter-container">
-      <label htmlFor="year-filter" className="form-label" style={{ marginBottom: '5px', display: 'block' }}>
+      {/* <label htmlFor="year-filter" className="form-label" style={{ marginBottom: '5px', display: 'block' }}>
         Filter Tahun:
-      </label>
+      </label> */}
       <select
         id="year-filter"
         className="form-input year-filter-select"
@@ -53,7 +53,8 @@ export default function YearFilter({ selectedYear, onYearChange, showAllOption =
       }}>
         {selectedYear 
           ? `Menampilkan data tahun ${selectedYear}` 
-          : 'Menampilkan semua data'
+          // : 'Menampilkan semua data'
+          : ''
         }
       </div>
     </div>

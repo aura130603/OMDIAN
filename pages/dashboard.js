@@ -126,10 +126,10 @@ export default function Dashboard() {
                 📚
               </div>
               <div className="card-content">
-                <h3 className="card-title">Riwayat Diklat/Workshop/Seminar</h3>
+                <h3 className="card-title">Riwayat Pelatihan</h3>
                 <p className="card-description">
                   {user.role === 'admin' 
-                    ? 'Kelola dan pantau riwayat pelatihan semua pegawai' 
+                    ? 'Kelola dan pantau riwayat diklat/workshop/seminar semua pegawai' 
                     : 'Lihat dan kelola riwayat pelatihan Anda'}
                 </p>
               </div>

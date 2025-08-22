@@ -27,14 +27,14 @@ export const validateFile = (file) => {
   if (!ALLOWED_TYPES.includes(file.type)) {
     return { 
       valid: false, 
-      error: 'Invalid file type. Only JPG, PNG, and PDF files are allowed.' 
+      error: 'Tipe file tidak valid. Hanya file bertipe JPG, PNG, and PDF yang diterima.' 
     }
   }
 
   if (file.size > MAX_FILE_SIZE) {
     return { 
       valid: false, 
-      error: 'File size too large. Maximum size is 5MB.' 
+      error: 'Ukuran file terlalu besar. Ukuran maksimalnya adalah 5MB.' 
     }
   }
 
@@ -43,7 +43,7 @@ export const validateFile = (file) => {
 
 export const saveFile = async (file) => {
   try {
-    // Generate unique filename
+    // Generate nama file unik
     const fileExtension = path.extname(file.name)
     const filename = `${uuidv4()}${fileExtension}`
     const filepath = path.join(uploadDir, filename)
@@ -58,7 +58,7 @@ export const saveFile = async (file) => {
       throw new Error('Unable to process file data')
     }
 
-    // Save file to disk
+    // simpan file ke disk
     fs.writeFileSync(filepath, buffer)
 
     // Return relative path that can be accessed via web

@@ -62,8 +62,8 @@ async function getTrainingData(req, res) {
   let queryParams = []
   let whereConditions = []
 
-  // If not admin, only show own training data
-  if (role !== 'admin') {
+  // If not admin or kepala_bps, only show own training data
+  if (role !== 'admin' && role !== 'kepala_bps') {
     whereConditions.push('t.user_id = ?')
     queryParams.push(userId)
   }

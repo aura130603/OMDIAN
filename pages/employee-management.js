@@ -15,13 +15,13 @@ export default function EmployeeManagement() {
   // Removed filters state as filters are no longer needed
 
   useEffect(() => {
-    if (!loading && (!user || user.role !== 'admin')) {
+    if (!loading && (!user || (user.role !== 'admin' && user.role !== 'kepala_bps'))) {
       router.push('/login')
     }
   }, [user, loading, router])
 
   useEffect(() => {
-    if (user && user.role === 'admin') {
+    if (user && (user.role === 'admin' || user.role === 'kepala_bps')) {
       const loadEmployeeData = async () => {
         try {
           const users = await getAllUsers()
@@ -153,7 +153,7 @@ export default function EmployeeManagement() {
     )
   }
 
-  if (!user || user.role !== 'admin') {
+  if (!user || (user.role !== 'admin' && user.role !== 'kepala_bps')) {
     return null
   }
 
@@ -170,7 +170,9 @@ export default function EmployeeManagement() {
               >
                 ← Kembali
               </button>
-              <h1 className="dashboard-title">Kelola Data Pegawai</h1>
+              <h1 className="dashboard-title">
+                {user.role === 'admin' ? 'Kelola Data Pegawai' : 'Data Pegawai BPS'}
+              </h1>
             </div>
             <div className="dashboard-user">
               <ProfileDropdown user={user} />
@@ -221,34 +223,36 @@ export default function EmployeeManagement() {
                   />
                 </div>
 
-                <button
-                  className="btn-add"
-                  onClick={handleAddEmployee}
-                  style={{
-                    padding: '10px 20px',
-                    fontSize: '14px',
-                    borderRadius: '6px',
-                    background: 'linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-medium) 100%)',
-                    color: 'white',
-                    border: 'none',
-                    cursor: 'pointer',
-                    fontWeight: '500',
-                    transition: 'all 0.2s ease',
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                    minWidth: 'fit-content',
-                    whiteSpace: 'nowrap'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.transform = 'translateY(-1px)'
-                    e.target.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)'
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.transform = 'translateY(0)'
-                    e.target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)'
-                  }}
-                >
-                  + Tambah Pegawai
-                </button>
+                {user.role === 'admin' && (
+                  <button
+                    className="btn-add"
+                    onClick={handleAddEmployee}
+                    style={{
+                      padding: '10px 20px',
+                      fontSize: '14px',
+                      borderRadius: '6px',
+                      background: 'linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-medium) 100%)',
+                      color: 'white',
+                      border: 'none',
+                      cursor: 'pointer',
+                      fontWeight: '500',
+                      transition: 'all 0.2s ease',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                      minWidth: 'fit-content',
+                      whiteSpace: 'nowrap'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.transform = 'translateY(-1px)'
+                      e.target.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)'
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.transform = 'translateY(0)'
+                      e.target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)'
+                    }}
+                  >
+                    + Tambah Pegawai
+                  </button>
+                )}
               </div>
             </div>
 
@@ -283,7 +287,7 @@ export default function EmployeeManagement() {
                       <th>Pendidikan</th>
                       <th>SKP</th>
                       <th>Status {currentYear}</th>
-                      <th>Aksi</th>
+                      {user.role === 'admin' && <th>Aksi</th>}
                     </tr>
                   </thead>
                   <tbody>
@@ -311,64 +315,66 @@ export default function EmployeeManagement() {
                               {thisYearCount > 0 ? `${thisYearCount} pelatihan` : 'Belum ada'}
                             </span>
                           </td>
-                          <td>
-                            <div style={{ display: 'flex', gap: '6px', justifyContent: 'center' }}>
-                              <button
-                                className="btn btn-small btn-secondary"
-                                onClick={() => handleEditEmployee(pegawai)}
-                                style={{
-                                  fontSize: '11px',
-                                  padding: '6px 12px',
-                                  borderRadius: '4px',
-                                  border: '1px solid var(--primary-medium)',
-                                  backgroundColor: 'transparent',
-                                  color: 'var(--primary-dark)',
-                                  cursor: 'pointer',
-                                  fontWeight: '500',
-                                  transition: 'all 0.2s ease'
-                                }}
-                                onMouseEnter={(e) => {
-                                  e.target.style.backgroundColor = 'var(--primary-medium)'
-                                  e.target.style.color = 'white'
-                                }}
-                                onMouseLeave={(e) => {
-                                  e.target.style.backgroundColor = 'transparent'
-                                  e.target.style.color = 'var(--primary-dark)'
-                                }}
-                                title="Edit data pegawai"
-                              >
-                                ✏️ Edit
-                              </button>
-                              {pegawai.role !== 'admin' && (
+                          {user.role === 'admin' && (
+                            <td>
+                              <div style={{ display: 'flex', gap: '6px', justifyContent: 'center' }}>
                                 <button
-                                  className="btn btn-small"
+                                  className="btn btn-small btn-secondary"
+                                  onClick={() => handleEditEmployee(pegawai)}
                                   style={{
                                     fontSize: '11px',
                                     padding: '6px 12px',
                                     borderRadius: '4px',
-                                    border: '1px solid var(--error)',
+                                    border: '1px solid var(--primary-medium)',
                                     backgroundColor: 'transparent',
-                                    color: 'var(--error)',
+                                    color: 'var(--primary-dark)',
                                     cursor: 'pointer',
                                     fontWeight: '500',
                                     transition: 'all 0.2s ease'
                                   }}
                                   onMouseEnter={(e) => {
-                                    e.target.style.backgroundColor = 'var(--error)'
+                                    e.target.style.backgroundColor = 'var(--primary-medium)'
                                     e.target.style.color = 'white'
                                   }}
                                   onMouseLeave={(e) => {
                                     e.target.style.backgroundColor = 'transparent'
-                                    e.target.style.color = 'var(--error)'
+                                    e.target.style.color = 'var(--primary-dark)'
                                   }}
-                                  onClick={() => handleDeleteEmployee(pegawai.id)}
-                                  title="Hapus pegawai"
+                                  title="Edit data pegawai"
                                 >
-                                  🗑️ Hapus
+                                  ✏️ Edit
                                 </button>
-                              )}
-                            </div>
-                          </td>
+                                {pegawai.role !== 'admin' && (
+                                  <button
+                                    className="btn btn-small"
+                                    style={{
+                                      fontSize: '11px',
+                                      padding: '6px 12px',
+                                      borderRadius: '4px',
+                                      border: '1px solid var(--error)',
+                                      backgroundColor: 'transparent',
+                                      color: 'var(--error)',
+                                      cursor: 'pointer',
+                                      fontWeight: '500',
+                                      transition: 'all 0.2s ease'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                      e.target.style.backgroundColor = 'var(--error)'
+                                      e.target.style.color = 'white'
+                                    }}
+                                    onMouseLeave={(e) => {
+                                      e.target.style.backgroundColor = 'transparent'
+                                      e.target.style.color = 'var(--error)'
+                                    }}
+                                    onClick={() => handleDeleteEmployee(pegawai.id)}
+                                    title="Hapus pegawai"
+                                  >
+                                    🗑️ Hapus
+                                  </button>
+                                )}
+                              </div>
+                            </td>
+                          )}
                         </tr>
                       )
                     })}

@@ -12,11 +12,7 @@ export default function Register() {
     pangkat: '',
     golongan: '',
     jabatan: '',
-    pendidikan: '',
-    nilaiSKP: '',
-    hukumanDisiplin: 'Tidak Pernah',
-    diklatPIM: 'Belum',
-    diklatFungsional: 'Belum'
+    pendidikan: ''
   })
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
@@ -221,94 +217,25 @@ export default function Register() {
           </div>
 
           <div className="form-section">
-            <h3 className="form-section-title">Informasi Akademik & Kinerja</h3>
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="pendidikan" className="form-label">
-                  Pendidikan Terakhir *
-                </label>
-                <select
-                  id="pendidikan"
-                  name="pendidikan"
-                  className="form-input"
-                  value={formData.pendidikan}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="">Pilih Pendidikan</option>
-                  <option value="SMA/SMK">SMA/SMK</option>
-                  <option value="D3">D3</option>
-                  <option value="S1">S1</option>
-                  <option value="S2">S2</option>
-                  <option value="S3">S3</option>
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="nilaiSKP" className="form-label">
-                  Nilai SKP Tahun Sebelumnya
-                </label>
-                <input
-                  type="number"
-                  id="nilaiSKP"
-                  name="nilaiSKP"
-                  className="form-input"
-                  value={formData.nilaiSKP}
-                  onChange={handleChange}
-                  min="0"
-                  max="100"
-                  placeholder="0-100"
-                />
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="hukumanDisiplin" className="form-label">
-                  Hukuman Disiplin
-                </label>
-                <select
-                  id="hukumanDisiplin"
-                  name="hukumanDisiplin"
-                  className="form-input"
-                  value={formData.hukumanDisiplin}
-                  onChange={handleChange}
-                >
-                  <option value="Tidak Pernah">Tidak Pernah</option>
-                  <option value="Pernah">Pernah</option>
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="diklatPIM" className="form-label">
-                  Diklat PIM
-                </label>
-                <select
-                  id="diklatPIM"
-                  name="diklatPIM"
-                  className="form-input"
-                  value={formData.diklatPIM}
-                  onChange={handleChange}
-                >
-                  <option value="Belum">Belum</option>
-                  <option value="Sudah">Sudah</option>
-                </select>
-              </div>
-            </div>
-
+            <h3 className="form-section-title">Informasi Pendidikan</h3>
             <div className="form-group">
-              <label htmlFor="diklatFungsional" className="form-label">
-                Diklat Fungsional
+              <label htmlFor="pendidikan" className="form-label">
+                Pendidikan Terakhir *
               </label>
               <select
-                id="diklatFungsional"
-                name="diklatFungsional"
+                id="pendidikan"
+                name="pendidikan"
                 className="form-input"
-                value={formData.diklatFungsional}
+                value={formData.pendidikan}
                 onChange={handleChange}
+                required
               >
-                <option value="Belum">Belum</option>
-                <option value="Sudah">Sudah</option>
+                <option value="">Pilih Pendidikan</option>
+                <option value="SMA/SMK">SMA/SMK</option>
+                <option value="D3">D3</option>
+                <option value="S1">S1</option>
+                <option value="S2">S2</option>
+                <option value="S3">S3</option>
               </select>
             </div>
           </div>

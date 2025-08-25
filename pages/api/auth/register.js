@@ -7,11 +7,11 @@ export default async function handler(req, res) {
   }
 
   try {
-    let username, password, nip, nama, pangkat, golongan, jabatan, pendidikan, nilaiSKP, hukumanDisiplin, diklatPIM, diklatFungsional;
+    let username, password, nip, nama, pangkat, golongan, jabatan, pendidikan;
 
     // Handle both JSON and form-encoded data
     if (req.headers['content-type']?.includes('application/json')) {
-      ({ username, password, nip, nama, pangkat, golongan, jabatan, pendidikan, nilaiSKP, hukumanDisiplin, diklatPIM, diklatFungsional } = req.body);
+      ({ username, password, nip, nama, pangkat, golongan, jabatan, pendidikan } = req.body);
     } else {
       // Handle form-encoded data
       const body = req.body;
@@ -31,10 +31,6 @@ export default async function handler(req, res) {
       golongan = cleanValue('golongan');
       jabatan = cleanValue('jabatan');
       pendidikan = cleanValue('pendidikan');
-      nilaiSKP = cleanValue('nilaiSKP');
-      hukumanDisiplin = cleanValue('hukumanDisiplin');
-      diklatPIM = cleanValue('diklatPIM');
-      diklatFungsional = cleanValue('diklatFungsional');
     }
 
     // Validation
@@ -83,9 +79,8 @@ export default async function handler(req, res) {
     // Insert new user
     const insertQuery = `
       INSERT INTO users (
-        username, password, nip, nama, pangkat, golongan, jabatan, pendidikan,
-        nilai_skp, hukuman_disiplin, diklat_pim, diklat_fungsional, role, status
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pegawai', 'aktif')
+        username, password, nip, nama, pangkat, golongan, jabatan, pendidikan, role, status
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pegawai', 'aktif')
     `
 
     const insertParams = [
@@ -96,11 +91,7 @@ export default async function handler(req, res) {
       pangkat,
       golongan,
       jabatan,
-      pendidikan,
-      nilaiSKP || null,
-      hukumanDisiplin || 'Tidak Pernah',
-      diklatPIM || 'Belum',
-      diklatFungsional || 'Belum'
+      pendidikan
     ]
 
     const result = await executeQuery(insertQuery, insertParams)

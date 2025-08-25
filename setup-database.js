@@ -24,11 +24,7 @@ async function setupDatabase() {
       golongan VARCHAR(10) NOT NULL,
       jabatan VARCHAR(100) NOT NULL,
       pendidikan VARCHAR(50) NOT NULL,
-      nilai_skp DECIMAL(5,2) NULL,
-      hukuman_disiplin ENUM('Tidak Pernah', 'Pernah') DEFAULT 'Tidak Pernah',
-      diklat_pim ENUM('Belum', 'Sudah') DEFAULT 'Belum',
-      diklat_fungsional ENUM('Belum', 'Sudah') DEFAULT 'Belum',
-      role ENUM('admin', 'pegawai') DEFAULT 'pegawai',
+      role ENUM('admin', 'pegawai', 'kepala_bps') DEFAULT 'pegawai',
       status ENUM('aktif', 'nonaktif') DEFAULT 'aktif',
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -79,25 +75,53 @@ async function setupDatabase() {
     const adminPassword = await bcrypt.hash('admin123', 10)
     const createAdminQuery = `
       INSERT INTO users (
-        username, password, nip, nama, pangkat, golongan, jabatan, pendidikan,
-        nilai_skp, hukuman_disiplin, diklat_pim, diklat_fungsional, role, status
+        username, password, nip, nama, pangkat, golongan, jabatan, pendidikan, role, status
       ) VALUES (
         'admin1', ?, '196512101989031003', 'Drs. Ahmad Wijaya', 'Pembina', 'IV/a',
-        'Kepala Subbagian Umum', 'S1 Administrasi Negara', 95, 'Tidak Pernah',
-        'Sudah', 'Sudah', 'admin', 'aktif'
+        'Kepala Subbagian Umum', 'S1 Administrasi Negara', 'admin', 'aktif'
       )
     `
 
     const adminResult = await executeQuery(createAdminQuery, [adminPassword])
     if (adminResult.success) {
       console.log('✅ Default admin user created')
-      console.log('   Username: admin1')
-      console.log('   Password: admin123')
+      console.log('   Username: Admin Omdian')
+      console.log('   Password: adminomdian3319')
     } else {
       console.error('❌ Failed to create admin user:', adminResult.error)
     }
   } else {
     console.log('✅ Admin user already exists')
+  }
+
+  // Check if kepala BPS user exists
+  const checkKepalaQuery = 'SELECT id FROM users WHERE role = "kepala_bps" LIMIT 1'
+  const kepalaCheck = await executeQuery(checkKepalaQuery)
+
+  if (kepalaCheck.success && kepalaCheck.data.length === 0) {
+    console.log('🔄 Creating default Kepala BPS user...')
+
+    // Create default Kepala BPS user
+    const kepalaPassword = await bcrypt.hash('kepala123', 10)
+    const createKepalaQuery = `
+      INSERT INTO users (
+        username, password, nip, nama, pangkat, golongan, jabatan, pendidikan, role, status
+      ) VALUES (
+        'kepala1', ?, '196010051985031001', 'Dr. Soekarno Wijaya, M.Si', 'Pembina Utama Muda', 'IV/c',
+        'Kepala BPS Kabupaten Kudus', 'S3 Statistik', 'kepala_bps', 'aktif'
+      )
+    `
+
+    const kepalaResult = await executeQuery(createKepalaQuery, [kepalaPassword])
+    if (kepalaResult.success) {
+      console.log('✅ Default Kepala BPS user created')
+      console.log('   Username: Kepala BPS Kudus')
+      console.log('   Password: kepalabps3319')
+    } else {
+      console.error('❌ Failed to create Kepala BPS user:', kepalaResult.error)
+    }
+  } else {
+    console.log('✅ Kepala BPS user already exists')
   }
 
   // Check if employee users exist
@@ -134,9 +158,8 @@ async function setupDatabase() {
     for (const employee of employees) {
       const createEmployeeQuery = `
         INSERT INTO users (
-          username, password, nip, nama, pangkat, golongan, jabatan, pendidikan,
-          nilai_skp, hukuman_disiplin, diklat_pim, diklat_fungsional, role, status
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 85, 'Tidak Pernah', 'Belum', 'Sudah', 'pegawai', 'aktif')
+          username, password, nip, nama, pangkat, golongan, jabatan, pendidikan, role, status
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pegawai', 'aktif')
       `
 
       const employeeResult = await executeQuery(createEmployeeQuery, [
@@ -157,6 +180,7 @@ async function setupDatabase() {
   console.log('\n🎉 Database setup completed!')
   console.log('\n📋 Default Login Credentials:')
   console.log('Admin: admin1 / admin123')
+  console.log('Kepala BPS: kepala1 / kepala123')
   console.log('Employee: pegawai1 / password123')
   console.log('Employee: pegawai2 / password123')
 }

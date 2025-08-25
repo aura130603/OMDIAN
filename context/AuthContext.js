@@ -103,7 +103,7 @@ export const AuthProvider = ({ children }) => {
   }
 
   const getAllUsers = async () => {
-    if (!user || user.role !== 'admin') {
+    if (!user || (user.role !== 'admin' && user.role !== 'kepala_bps')) {
       return []
     }
 
@@ -146,7 +146,7 @@ export const AuthProvider = ({ children }) => {
   }
 
   const getAllTrainingData = async (year = null) => {
-    if (!user || user.role !== 'admin') {
+    if (!user || (user.role !== 'admin' && user.role !== 'kepala_bps')) {
       return []
     }
 

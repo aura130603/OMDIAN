@@ -582,16 +582,13 @@ export default function EnhancedAdminDashboard({ user }) {
                           <td>
                             <strong>{training.tema}</strong>
                             {training.keterangan && (
-                              <div style={{ 
-                                fontSize: '12px', 
+                              <div style={{
+                                fontSize: '12px',
                                 color: 'var(--text-medium)',
                                 marginTop: '4px',
-                                maxWidth: '200px',
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                whiteSpace: 'nowrap'
-                              }} title={training.keterangan}>
-                                {training.keterangan}
+                                fontWeight: 'bold'
+                              }}>
+                                {training.keterangan} jam pelajaran
                               </div>
                             )}
                           </td>

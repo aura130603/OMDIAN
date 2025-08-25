@@ -219,7 +219,7 @@ export default function TrainingHistory() {
                       <th>Penyelenggara</th>
                       <th>Tanggal Mulai</th>
                       <th>Tanggal Selesai</th>
-                      <th>Keterangan</th>
+                      <th>Jam Pelajaran</th>
                       <th>Sertifikat</th>
                       <th>Aksi</th>
                     </tr>
@@ -242,14 +242,9 @@ export default function TrainingHistory() {
                         <td>{formatDate(training.tanggalMulai)}</td>
                         <td>{formatDate(training.tanggalSelesai)}</td>
                         <td>
-                          <div style={{ 
-                            maxWidth: '200px', 
-                            overflow: 'hidden', 
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap'
-                          }} title={training.keterangan}>
-                            {training.keterangan || '-'}
-                          </div>
+                          <span style={{ fontWeight: 'bold' }}>
+                            {training.keterangan ? `${training.keterangan} jam` : '-'}
+                          </span>
                         </td>
                         <td>
                           {training.sertifikat ? (

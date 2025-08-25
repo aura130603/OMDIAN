@@ -76,14 +76,8 @@ export default async function handler(req, res) {
     // Remove password from response
     const { password: _, ...userWithoutPassword } = user
 
-    // Map database fields to frontend format
-    const userResponse = {
-      ...userWithoutPassword,
-      nilaiSKP: user.nilai_skp,
-      hukumanDisiplin: user.hukuman_disiplin,
-      diklatPIM: user.diklat_pim,
-      diklatFungsional: user.diklat_fungsional
-    }
+    // Use user data without unwanted fields
+    const userResponse = userWithoutPassword
 
     console.log('✅ Login successful from database:', userResponse.username)
 

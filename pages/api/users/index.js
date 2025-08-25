@@ -28,16 +28,16 @@ export default async function handler(req, res) {
 async function getUsers(req, res) {
   const { role } = req.query
 
-  // Only admin can access user list
-  if (role !== 'admin') {
-    return res.status(403).json({ 
-      success: false, 
-      message: 'Akses ditolak' 
+  // Only admin and kepala_bps can access user list
+  if (role !== 'admin' && role !== 'kepala_bps') {
+    return res.status(403).json({
+      success: false,
+      message: 'Akses ditolak'
     })
   }
 
   const query = `
-    SELECT 
+    SELECT
       id,
       username,
       nip,
@@ -46,14 +46,10 @@ async function getUsers(req, res) {
       golongan,
       jabatan,
       pendidikan,
-      nilai_skp as nilaiSKP,
-      hukuman_disiplin as hukumanDisiplin,
-      diklat_pim as diklatPIM,
-      diklat_fungsional as diklatFungsional,
       role,
       status,
       created_at as createdAt
-    FROM users 
+    FROM users
     ORDER BY created_at DESC
   `
 
@@ -77,27 +73,23 @@ async function getUsers(req, res) {
 
 // POST - Create new user (Admin only)
 async function createUser(req, res) {
-  const { 
+  const {
     requestorRole,
-    username, 
-    password, 
-    nip, 
-    nama, 
-    pangkat, 
-    golongan, 
-    jabatan, 
-    pendidikan, 
-    nilaiSKP,
-    hukumanDisiplin,
-    diklatPIM,
-    diklatFungsional 
+    username,
+    password,
+    nip,
+    nama,
+    pangkat,
+    golongan,
+    jabatan,
+    pendidikan
   } = req.body
 
-  // Only admin can create users
+  // Only admin can create users (kepala_bps can only read)
   if (requestorRole !== 'admin') {
-    return res.status(403).json({ 
-      success: false, 
-      message: 'Akses ditolak' 
+    return res.status(403).json({
+      success: false,
+      message: 'Akses ditolak - Hanya admin yang dapat menambah pegawai'
     })
   }
 
@@ -133,9 +125,8 @@ async function createUser(req, res) {
   // Insert new user
   const insertQuery = `
     INSERT INTO users (
-      username, password, nip, nama, pangkat, golongan, jabatan, pendidikan,
-      nilai_skp, hukuman_disiplin, diklat_pim, diklat_fungsional, role, status
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pegawai', 'aktif')
+      username, password, nip, nama, pangkat, golongan, jabatan, pendidikan, role, status
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pegawai', 'aktif')
   `
 
   const insertParams = [
@@ -146,11 +137,7 @@ async function createUser(req, res) {
     pangkat,
     golongan,
     jabatan,
-    pendidikan,
-    nilaiSKP || null,
-    hukumanDisiplin || 'Tidak Pernah',
-    diklatPIM || 'Belum',
-    diklatFungsional || 'Belum'
+    pendidikan
   ]
 
   const result = await executeQuery(insertQuery, insertParams)
@@ -173,27 +160,23 @@ async function createUser(req, res) {
 
 // PUT - Update user
 async function updateUser(req, res) {
-  const { 
+  const {
     requestorRole,
     id,
-    username, 
+    username,
     password,
-    nama, 
-    pangkat, 
-    golongan, 
-    jabatan, 
-    pendidikan, 
-    nilaiSKP,
-    hukumanDisiplin,
-    diklatPIM,
-    diklatFungsional 
+    nama,
+    pangkat,
+    golongan,
+    jabatan,
+    pendidikan
   } = req.body
 
-  // Only admin can update users
+  // Only admin can update users (kepala_bps can only read)
   if (requestorRole !== 'admin') {
-    return res.status(403).json({ 
-      success: false, 
-      message: 'Akses ditolak' 
+    return res.status(403).json({
+      success: false,
+      message: 'Akses ditolak - Hanya admin yang dapat mengubah data pegawai'
     })
   }
 
@@ -217,15 +200,11 @@ async function updateUser(req, res) {
 
   // Build update query
   let updateQuery = `
-    UPDATE users SET 
-      username = ?, nama = ?, pangkat = ?, golongan = ?, jabatan = ?, 
-      pendidikan = ?, nilai_skp = ?, hukuman_disiplin = ?, 
-      diklat_pim = ?, diklat_fungsional = ?
+    UPDATE users SET
+      username = ?, nama = ?, pangkat = ?, golongan = ?, jabatan = ?, pendidikan = ?
   `
   let updateParams = [
-    username, nama, pangkat, golongan, jabatan, pendidikan,
-    nilaiSKP || null, hukumanDisiplin || 'Tidak Pernah',
-    diklatPIM || 'Belum', diklatFungsional || 'Belum'
+    username, nama, pangkat, golongan, jabatan, pendidikan
   ]
 
   // Add password to update if provided
@@ -260,11 +239,11 @@ async function updateUser(req, res) {
 async function deleteUser(req, res) {
   const { id, requestorRole } = req.query
 
-  // Only admin can delete users
+  // Only admin can delete users (kepala_bps can only read)
   if (requestorRole !== 'admin') {
-    return res.status(403).json({ 
-      success: false, 
-      message: 'Akses ditolak' 
+    return res.status(403).json({
+      success: false,
+      message: 'Akses ditolak - Hanya admin yang dapat menghapus pegawai'
     })
   }
 

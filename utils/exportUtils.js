@@ -82,10 +82,6 @@ export const exportEmployeeReport = (employees, trainingData) => {
       'Golongan': employee.golongan,
       'Jabatan': employee.jabatan,
       'Pendidikan': employee.pendidikan,
-      'Nilai SKP': employee.nilaiSKP || '-',
-      'Hukuman Disiplin': employee.hukumanDisiplin,
-      'Diklat PIM': employee.diklatPIM,
-      'Diklat Fungsional': employee.diklatFungsional,
       'Total Pelatihan': employeeTraining.length,
       [`Pelatihan ${currentYear}`]: thisYearTraining.length,
       'Status Kelengkapan': thisYearTraining.length > 0 ? 'Lengkap' : 'Belum Lengkap'
@@ -105,7 +101,7 @@ export const exportTrainingReport = (trainingData) => {
     'Tanggal Selesai': formatDate(training.tanggalSelesai),
     'Durasi (Hari)': calculateDuration(training.tanggalMulai, training.tanggalSelesai),
     'Status Sertifikat': training.sertifikat ? 'Sudah Upload' : 'Belum Upload',
-    'Keterangan': training.keterangan || '-',
+    'Jam Pelajaran': training.keterangan ? `${training.keterangan} jam` : '-',
     'Tahun Pelaksanaan': new Date(training.tanggalMulai).getFullYear()
   }))
 

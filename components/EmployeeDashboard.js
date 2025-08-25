@@ -114,7 +114,7 @@ export default function EmployeeDashboard({ user }) {
                       <th>Penyelenggara</th>
                       <th>Tanggal Mulai</th>
                       <th>Tanggal Selesai</th>
-                      <th>Keterangan</th>
+                      <th>Jam Pelajaran</th>
                       <th>Sertifikat</th>
                       <th>Aksi</th>
                     </tr>
@@ -129,14 +129,9 @@ export default function EmployeeDashboard({ user }) {
                         <td>{formatDate(training.tanggalMulai)}</td>
                         <td>{formatDate(training.tanggalSelesai)}</td>
                         <td>
-                          <div style={{ 
-                            maxWidth: '200px', 
-                            overflow: 'hidden', 
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap'
-                          }} title={training.keterangan}>
-                            {training.keterangan}
-                          </div>
+                          <span style={{ fontWeight: 'bold' }}>
+                            {training.keterangan} jam
+                          </span>
                         </td>
                         <td>
                           {training.sertifikat ? (

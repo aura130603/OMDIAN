@@ -108,10 +108,6 @@ export default function handler(req, res) {
       golongan: user.golongan,
       jabatan: user.jabatan,
       pendidikan: user.pendidikan,
-      nilaiSKP: user.nilai_skp,
-      hukumanDisiplin: user.hukuman_disiplin,
-      diklatPim: user.diklat_pim,
-      diklatFungsional: user.diklat_fungsional,
       role: user.role,
       status: user.status,
       createdAt: user.created_at

@@ -25,7 +25,7 @@ export default function Dashboard() {
         try {
           const currentYear = new Date().getFullYear()
 
-          if (user.role === 'admin') {
+          if (user.role === 'admin' || user.role === 'kepala_bps') {
             const users = await getAllUsers()
             const training = await getAllTrainingData()
             const thisYearTraining = training.filter(t => {
@@ -111,8 +111,10 @@ export default function Dashboard() {
               Selamat Datang, {user.nama}
             </h2>
             <p className="welcome-subtitle">
-              {user.role === 'admin' 
-                ? 'Kelola data pengembangan kompetensi pegawai dengan mudah' 
+              {user.role === 'admin'
+                ? 'Kelola data pengembangan kompetensi pegawai dengan mudah'
+                : user.role === 'kepala_bps'
+                ? 'Monitor progress pengembangan kompetensi seluruh pegawai BPS'
                 : 'Kelola riwayat pengembangan kompetensi Anda'}
             </p>
           </div>
@@ -128,8 +130,10 @@ export default function Dashboard() {
               <div className="card-content">
                 <h3 className="card-title">Riwayat Pelatihan</h3>
                 <p className="card-description">
-                  {user.role === 'admin' 
-                    ? 'Kelola dan pantau riwayat diklat/workshop/seminar semua pegawai' 
+                  {user.role === 'admin'
+                    ? 'Kelola dan pantau riwayat diklat/workshop/seminar semua pegawai'
+                    : user.role === 'kepala_bps'
+                    ? 'Monitor riwayat pelatihan seluruh pegawai BPS'
                     : 'Lihat dan kelola riwayat pelatihan Anda'}
                 </p>
               </div>
@@ -148,8 +152,10 @@ export default function Dashboard() {
               <div className="card-content">
                 <h3 className="card-title">Statistik Pengembangan Kompetensi</h3>
                 <p className="card-description">
-                  {user.role === 'admin' 
-                    ? 'Analisis dan laporan komprehensif pengembangan kompetensi' 
+                  {user.role === 'admin'
+                    ? 'Analisis dan laporan komprehensif pengembangan kompetensi'
+                    : user.role === 'kepala_bps'
+                    ? 'Analisis dan laporan monitoring kompetensi pegawai'
                     : 'Lihat statistik dan progress pengembangan kompetensi Anda'}
                 </p>
               </div>
@@ -159,7 +165,7 @@ export default function Dashboard() {
             </div>
 
             {user.role === 'admin' && (
-              <div 
+              <div
                 className="dashboard-card management-card"
                 onClick={() => handleCardClick('/employee-management')}
               >
@@ -177,6 +183,26 @@ export default function Dashboard() {
                 </div>
               </div>
             )}
+
+            {user.role === 'kepala_bps' && (
+              <div
+                className="dashboard-card monitoring-card"
+                onClick={() => handleCardClick('/kepala-monitoring')}
+              >
+                <div className="card-icon">
+                  📈
+                </div>
+                <div className="card-content">
+                  <h3 className="card-title">Monitoring Kompetensi</h3>
+                  <p className="card-description">
+                    Dashboard khusus monitoring progress jam pelajaran dan kompetensi pegawai
+                  </p>
+                </div>
+                <div className="card-arrow">
+                  →
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="quick-stats">
@@ -184,18 +210,18 @@ export default function Dashboard() {
             <div className="stats-grid">
               <div className="stat-item">
                 <div className="stat-number">
-                  {user.role === 'admin' ? quickStats.totalEmployees : quickStats.thisYearTraining}
+                  {(user.role === 'admin' || user.role === 'kepala_bps') ? quickStats.totalEmployees : quickStats.thisYearTraining}
                 </div>
                 <div className="stat-label">
-                  {user.role === 'admin' ? 'Total Pegawai' : 'Pelatihan Tahun Ini'}
+                  {(user.role === 'admin' || user.role === 'kepala_bps') ? 'Total Pegawai' : 'Pelatihan Tahun Ini'}
                 </div>
               </div>
               <div className="stat-item">
                 <div className="stat-number">
-                  {user.role === 'admin' ? quickStats.totalTraining : quickStats.totalTraining}
+                  {quickStats.totalTraining}
                 </div>
                 <div className="stat-label">
-                  {user.role === 'admin' ? 'Total Pelatihan' : 'Total Pelatihan'}
+                  Total Pelatihan
                 </div>
               </div>
               <div className="stat-item">
@@ -203,7 +229,7 @@ export default function Dashboard() {
                   {quickStats.completionRate}%
                 </div>
                 <div className="stat-label">
-                  {user.role === 'admin' ? 'Tingkat Kelengkapan' : 'Progress Sertifikat'}
+                  {(user.role === 'admin' || user.role === 'kepala_bps') ? 'Tingkat Kelengkapan' : 'Progress Sertifikat'}
                 </div>
               </div>
             </div>

@@ -237,9 +237,6 @@ export default function AdminDashboard({ user }) {
                         <th>Pangkat/Gol</th>
                         <th>Jabatan</th>
                         <th>Pendidikan</th>
-                        <th>SKP</th>
-                        <th>Diklat PIM</th>
-                        <th>Diklat Fungsional</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -255,17 +252,6 @@ export default function AdminDashboard({ user }) {
                           </td>
                           <td>{pegawai.jabatan}</td>
                           <td>{pegawai.pendidikan}</td>
-                          <td>{pegawai.nilaiSKP || '-'}</td>
-                          <td>
-                            <span className={`status-badge ${pegawai.diklatPIM === 'Sudah' ? 'status-active' : 'status-inactive'}`}>
-                              {pegawai.diklatPIM}
-                            </span>
-                          </td>
-                          <td>
-                            <span className={`status-badge ${pegawai.diklatFungsional === 'Sudah' ? 'status-active' : 'status-inactive'}`}>
-                              {pegawai.diklatFungsional}
-                            </span>
-                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -325,16 +311,13 @@ export default function AdminDashboard({ user }) {
                           <td>
                             <strong>{training.tema}</strong>
                             {training.keterangan && (
-                              <div style={{ 
-                                fontSize: '12px', 
+                              <div style={{
+                                fontSize: '12px',
                                 color: 'var(--text-medium)',
                                 marginTop: '4px',
-                                maxWidth: '200px',
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                whiteSpace: 'nowrap'
-                              }} title={training.keterangan}>
-                                {training.keterangan}
+                                fontWeight: 'bold'
+                              }}>
+                                {training.keterangan} jam pelajaran
                               </div>
                             )}
                           </td>

@@ -8,7 +8,7 @@ export default function TrainingModal({ training, onSave, onClose }) {
     penyelenggara: '',
     tanggalMulai: '',
     tanggalSelesai: '',
-    keterangan: '',
+    jamPelajaran: '',
     sertifikat: null,
     statusSertifikat: 'belum_upload' // belum_upload, sudah_upload
   })
@@ -24,7 +24,7 @@ export default function TrainingModal({ training, onSave, onClose }) {
         penyelenggara: training.penyelenggara || '',
         tanggalMulai: training.tanggalMulai || '',
         tanggalSelesai: training.tanggalSelesai || '',
-        keterangan: training.keterangan || '',
+        jamPelajaran: training.keterangan || '',
         sertifikat: training.sertifikat || null,
         statusSertifikat: training.sertifikat ? 'sudah_upload' : 'belum_upload'
       })
@@ -142,7 +142,13 @@ export default function TrainingModal({ training, onSave, onClose }) {
     }
 
     try {
-      await onSave(formData)
+      // Map jamPelajaran back to keterangan for backend compatibility
+      const dataToSave = {
+        ...formData,
+        keterangan: formData.jamPelajaran
+      }
+      delete dataToSave.jamPelajaran
+      await onSave(dataToSave)
     } catch (err) {
       setError('Terjadi kesalahan. Silakan coba lagi.')
     } finally {
@@ -235,17 +241,18 @@ export default function TrainingModal({ training, onSave, onClose }) {
           </div>
 
           <div className="form-group">
-            <label htmlFor="keterangan" className="form-label">
-              Keterangan
+            <label htmlFor="jamPelajaran" className="form-label">
+              Jam Pelajaran
             </label>
-            <textarea
-              id="keterangan"
-              name="keterangan"
+            <input
+              type="number"
+              id="jamPelajaran"
+              name="jamPelajaran"
               className="form-input"
-              value={formData.keterangan}
+              value={formData.jamPelajaran}
               onChange={handleChange}
-              rows={4}
-              placeholder="Deskripsi singkat tentang materi pelatihan, manfaat yang diperoleh, dll."
+              min="1"
+              placeholder="Jumlah jam pelajaran yang diikuti"
             />
           </div>
 

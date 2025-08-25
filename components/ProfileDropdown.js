@@ -36,7 +36,8 @@ export default function ProfileDropdown({ user }) {
         <div className="profile-info">
           <div className="profile-name">{user.nama}</div>
           <div className="profile-role">
-            {user.role === 'admin' ? 'Administrator' : 'Pegawai'}
+            {user.role === 'admin' ? 'Administrator' :
+             user.role === 'kepala_bps' ? 'Kepala BPS' : 'Pegawai'}
           </div>
         </div>
         <div className="profile-arrow">
@@ -69,26 +70,6 @@ export default function ProfileDropdown({ user }) {
             <div className="profile-item">
               <span className="profile-label">Pendidikan</span>
               <span className="profile-value">{user.pendidikan}</span>
-            </div>
-            <div className="profile-item">
-              <span className="profile-label">Nilai SKP</span>
-              <span className="profile-value">{user.nilaiSKP || '-'}</span>
-            </div>
-            <div className="profile-item">
-              <span className="profile-label">Diklat PIM</span>
-              <span className="profile-value">
-                <span className={`status-badge ${user.diklatPIM === 'Sudah' ? 'status-active' : 'status-inactive'}`}>
-                  {user.diklatPIM}
-                </span>
-              </span>
-            </div>
-            <div className="profile-item">
-              <span className="profile-label">Diklat Fungsional</span>
-              <span className="profile-value">
-                <span className={`status-badge ${user.diklatFungsional === 'Sudah' ? 'status-active' : 'status-inactive'}`}>
-                  {user.diklatFungsional}
-                </span>
-              </span>
             </div>
           </div>
 

@@ -133,7 +133,7 @@ export default function Dashboard() {
                   {user.role === 'admin'
                     ? 'Kelola dan pantau riwayat diklat/workshop/seminar semua pegawai'
                     : user.role === 'kepala_bps'
-                    ? 'Monitor riwayat pelatihan seluruh pegawai BPS'
+                    ? 'Kelola riwayat pelatihan pribadi sebagai Kepala BPS'
                     : 'Lihat dan kelola riwayat pelatihan Anda'}
                 </p>
               </div>
@@ -187,7 +187,7 @@ export default function Dashboard() {
             {user.role === 'kepala_bps' && (
               <div
                 className="dashboard-card monitoring-card"
-                onClick={() => handleCardClick('/kepala-monitoring')}
+                onClick={() => handleCardClick('/enhanced-monitoring')}
               >
                 <div className="card-icon">
                   📈
@@ -195,7 +195,7 @@ export default function Dashboard() {
                 <div className="card-content">
                   <h3 className="card-title">Monitoring Kompetensi</h3>
                   <p className="card-description">
-                    Dashboard khusus monitoring progress jam pelajaran dan kompetensi pegawai
+                    Monitoring lanjutan semua data pelatihan pegawai dengan analisis detail dan laporan
                   </p>
                 </div>
                 <div className="card-arrow">

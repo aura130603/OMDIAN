@@ -28,6 +28,10 @@ export default function TrainingHistory() {
           if (user.role === 'admin') {
             const data = await getAllTrainingData(selectedYear)
             setTrainingData(data)
+          } else if (user.role === 'kepala_bps') {
+            // Kepala BPS can manage their own training data like employees
+            const data = await getUserTrainingData(user.id, selectedYear)
+            setTrainingData(data)
           } else {
             const data = await getUserTrainingData(user.id, selectedYear)
             setTrainingData(data)
@@ -166,7 +170,9 @@ export default function TrainingHistory() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
                   <h2 className="card-title">
-                    {user.role === 'admin' ? 'Semua Data Pelatihan' : 'Riwayat Pelatihan Anda'}
+                    {user.role === 'admin' ? 'Semua Data Pelatihan' :
+                     user.role === 'kepala_bps' ? 'Riwayat Pelatihan Kepala BPS' :
+                     'Riwayat Pelatihan Anda'}
                     ({filteredTrainingData.length})
                   </h2>
                   <YearFilter
@@ -182,7 +188,7 @@ export default function TrainingHistory() {
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
                 </div>
-                {user.role !== 'admin' && (
+                {(user.role === 'employee' || user.role === 'kepala_bps') && (
                   <button className="btn-add" onClick={handleAddTraining}>
                     + Tambah Data
                   </button>
@@ -264,8 +270,8 @@ export default function TrainingHistory() {
                         </td>
                         <td>
                           <div style={{ display: 'flex', gap: '5px' }}>
-                            {user.role !== 'admin' ? (
-                              <button 
+                            {(user.role === 'employee' || user.role === 'kepala_bps') ? (
+                              <button
                                 className="btn btn-small btn-secondary"
                                 onClick={() => handleEditTraining(training)}
                               >

@@ -58,7 +58,7 @@ export default function ProfileDropdown({ user }) {
             </div>
           </div>
           
-          <div className="profile-dropdown-body">
+          {/* <div className="profile-dropdown-body">
             <div className="profile-item">
               <span className="profile-label">Pangkat</span>
               <span className="profile-value">{user.pangkat}</span>
@@ -71,7 +71,7 @@ export default function ProfileDropdown({ user }) {
               <span className="profile-label">Pendidikan</span>
               <span className="profile-value">{user.pendidikan}</span>
             </div>
-          </div>
+          </div> */}
 
           <div className="profile-dropdown-footer">
             <button 

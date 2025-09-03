@@ -39,10 +39,19 @@ export default function EnhancedAdminDashboard({ user }) {
 
   useEffect(() => {
     if (user && user.role === 'admin') {
-      const users = getAllUsers()
-      const training = getAllTrainingData()
-      setAllUsers(users)
-      setAllTraining(training)
+      const loadData = async () => {
+        try {
+          const users = await getAllUsers()
+          const training = await getAllTrainingData()
+          setAllUsers(users)
+          setAllTraining(training)
+        } catch (error) {
+          console.error('Error loading admin data:', error)
+          setAllUsers([])
+          setAllTraining([])
+        }
+      }
+      loadData()
     }
   }, [user, getAllUsers, getAllTrainingData])
 
@@ -50,7 +59,7 @@ export default function EnhancedAdminDashboard({ user }) {
     if (window.confirm('Apakah Anda yakin ingin menghapus data pelatihan ini?')) {
       const result = await deleteTrainingData(trainingId)
       if (result.success) {
-        const updatedTraining = getAllTrainingData()
+        const updatedTraining = await getAllTrainingData()
         setAllTraining(updatedTraining)
       }
     }
@@ -70,7 +79,7 @@ export default function EnhancedAdminDashboard({ user }) {
     if (window.confirm('Apakah Anda yakin ingin menghapus data pegawai ini?')) {
       const result = await deleteUser(employeeId)
       if (result.success) {
-        const updatedUsers = getAllUsers()
+        const updatedUsers = await getAllUsers()
         setAllUsers(updatedUsers)
       }
     }
@@ -80,14 +89,14 @@ export default function EnhancedAdminDashboard({ user }) {
     if (editingEmployee) {
       const result = await updateUser(editingEmployee.id, employeeData)
       if (result.success) {
-        const updatedUsers = getAllUsers()
+        const updatedUsers = await getAllUsers()
         setAllUsers(updatedUsers)
         setShowEmployeeModal(false)
       }
     } else {
       const result = await addUser(employeeData)
       if (result.success) {
-        const updatedUsers = getAllUsers()
+        const updatedUsers = await getAllUsers()
         setAllUsers(updatedUsers)
         setShowEmployeeModal(false)
       }
@@ -129,7 +138,7 @@ export default function EnhancedAdminDashboard({ user }) {
       if (filters.status !== 'all') {
         const hasCurrentYearTraining = allTraining.some(training => {
           const year = new Date(training.tanggalMulai).getFullYear()
-          return training.pegawaiId === employee.id && year === currentYear
+          return training.userId === employee.id && year === currentYear
         })
         statusMatch = filters.status === 'complete' ? hasCurrentYearTraining : !hasCurrentYearTraining
       }
@@ -165,7 +174,7 @@ export default function EnhancedAdminDashboard({ user }) {
     })
 
     const employeesWithTraining = new Set(
-      thisYearTraining.map(t => t.pegawaiId)
+      thisYearTraining.map(t => t.userId)
     ).size
 
     const employeesWithoutTraining = allUsers.length - employeesWithTraining
@@ -342,10 +351,10 @@ export default function EnhancedAdminDashboard({ user }) {
                       </thead>
                       <tbody>
                         {allUsers.map((pegawai) => {
-                          const trainingCount = allTraining.filter(t => t.pegawaiId === pegawai.id).length
+                          const trainingCount = allTraining.filter(t => t.userId === pegawai.id).length
                           const thisYearCount = allTraining.filter(t => {
                             const year = new Date(t.tanggalMulai).getFullYear()
-                            return t.pegawaiId === pegawai.id && year === currentYear
+                            return t.userId === pegawai.id && year === currentYear
                           }).length
 
                           return (
@@ -451,7 +460,7 @@ export default function EnhancedAdminDashboard({ user }) {
                       {filteredEmployees.map((pegawai) => {
                         const thisYearCount = allTraining.filter(t => {
                           const year = new Date(t.tanggalMulai).getFullYear()
-                          return t.pegawaiId === pegawai.id && year === currentYear
+                          return t.userId === pegawai.id && year === currentYear
                         }).length
 
                         return (
@@ -698,11 +707,11 @@ export default function EnhancedAdminDashboard({ user }) {
                       {allUsers.filter(pegawai => {
                         const thisYearCount = allTraining.filter(t => {
                           const year = new Date(t.tanggalMulai).getFullYear()
-                          return t.pegawaiId === pegawai.id && year === currentYear
+                          return t.userId === pegawai.id && year === currentYear
                         }).length
                         return thisYearCount === 0
                       }).map((pegawai) => {
-                        const allUserTraining = allTraining.filter(t => t.pegawaiId === pegawai.id)
+                        const allUserTraining = allTraining.filter(t => t.userId === pegawai.id)
                         const lastTraining = allUserTraining.sort((a, b) => 
                           new Date(b.tanggalMulai) - new Date(a.tanggalMulai)
                         )[0]

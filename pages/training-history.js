@@ -5,6 +5,7 @@ import ProfileDropdown from '../components/ProfileDropdown'
 import TrainingModal from '../components/TrainingModal'
 import YearFilter from '../components/YearFilter'
 import { viewCertificate } from '../utils/exportUtils'
+import Pagination from '../components/Pagination'
 
 export default function TrainingHistory() {
   const { user, loading, getUserTrainingData, getAllTrainingData, addTrainingData, updateTrainingData, deleteTrainingData } = useContext(AuthContext)
@@ -14,6 +15,8 @@ export default function TrainingHistory() {
   const [editingTraining, setEditingTraining] = useState(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedYear, setSelectedYear] = useState(null)
+  const [page, setPage] = useState(1)
+  const pageSize = 10
 
   useEffect(() => {
     if (!loading && !user) {
@@ -44,6 +47,8 @@ export default function TrainingHistory() {
       loadTrainingData()
     }
   }, [user, selectedYear, getUserTrainingData, getAllTrainingData])
+
+  useEffect(() => { setPage(1) }, [searchTerm, selectedYear])
 
   const handleAddTraining = () => {
     setEditingTraining(null)
@@ -231,7 +236,9 @@ export default function TrainingHistory() {
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredTrainingData.map((training) => (
+                    {filteredTrainingData
+                      .slice((page - 1) * pageSize, page * pageSize)
+                      .map((training) => (
                       <tr key={training.id}>
                         {user.role === 'admin' && (
                           <td>
@@ -296,6 +303,14 @@ export default function TrainingHistory() {
                     ))}
                   </tbody>
                 </table>
+                <div>
+                  <Pagination
+                    currentPage={page}
+                    totalItems={filteredTrainingData.length}
+                    pageSize={pageSize}
+                    onPageChange={setPage}
+                  />
+                </div>
               </div>
             )}
           </div>

@@ -69,7 +69,7 @@ export const exportEmployeeReport = (employees, trainingData) => {
   const currentYear = new Date().getFullYear()
   
   const reportData = employees.map(employee => {
-    const employeeTraining = trainingData.filter(t => t.pegawaiId === employee.id)
+    const employeeTraining = trainingData.filter(t => t.userId === employee.id)
     const thisYearTraining = employeeTraining.filter(t => {
       const year = new Date(t.tanggalMulai).getFullYear()
       return year === currentYear
@@ -112,7 +112,7 @@ export const exportMonitoringReport = (employees, trainingData) => {
   const currentYear = new Date().getFullYear()
   
   const monitoringData = employees.map(employee => {
-    const employeeTraining = trainingData.filter(t => t.pegawaiId === employee.id)
+    const employeeTraining = trainingData.filter(t => t.userId === employee.id)
     const thisYearTraining = employeeTraining.filter(t => {
       const year = new Date(t.tanggalMulai).getFullYear()
       return year === currentYear
@@ -189,7 +189,7 @@ export const generateSummaryStats = (employees, trainingData) => {
     return year === currentYear
   })
 
-  const employeesWithTraining = new Set(thisYearTraining.map(t => t.pegawaiId)).size
+  const employeesWithTraining = new Set(thisYearTraining.map(t => t.userId)).size
   const totalTrainingHours = thisYearTraining.reduce((total, training) => {
     const duration = calculateDuration(training.tanggalMulai, training.tanggalSelesai)
     return total + (isNaN(duration) ? 0 : duration)

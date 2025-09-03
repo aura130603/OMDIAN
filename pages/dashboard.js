@@ -25,14 +25,14 @@ export default function Dashboard() {
         try {
           const currentYear = new Date().getFullYear()
 
-          if (user.role === 'admin' || user.role === 'kepala_bps') {
+          if (user.role === 'admin') {
             const users = await getAllUsers()
             const training = await getAllTrainingData()
             const thisYearTraining = training.filter(t => {
               const year = new Date(t.tanggalMulai).getFullYear()
               return year === currentYear
             })
-            const employeesWithTraining = new Set(thisYearTraining.map(t => t.pegawaiId)).size
+            const employeesWithTraining = new Set(thisYearTraining.map(t => t.userId)).size
             const completionRate = users.length > 0 ? Math.round((employeesWithTraining / users.length) * 100) : 0
 
             setQuickStats({
@@ -51,10 +51,10 @@ export default function Dashboard() {
             const certificateRate = training.length > 0 ? Math.round((certificateCount / training.length) * 100) : 0
 
             setQuickStats({
-              totalEmployees: 0, // Not relevant for employee
+              totalEmployees: 0,
               totalTraining: training.length,
               thisYearTraining: thisYearTraining.length,
-              completionRate: certificateRate // For employee, this represents certificate completion rate
+              completionRate: certificateRate
             })
           }
         } catch (error) {
@@ -210,10 +210,10 @@ export default function Dashboard() {
             <div className="stats-grid">
               <div className="stat-item">
                 <div className="stat-number">
-                  {(user.role === 'admin' || user.role === 'kepala_bps') ? quickStats.totalEmployees : quickStats.thisYearTraining}
+                  {user.role === 'admin' ? quickStats.totalEmployees : quickStats.thisYearTraining}
                 </div>
                 <div className="stat-label">
-                  {(user.role === 'admin' || user.role === 'kepala_bps') ? 'Total Pegawai' : 'Pelatihan Tahun Ini'}
+                  {user.role === 'admin' ? 'Total Pegawai' : 'Pelatihan Tahun Ini'}
                 </div>
               </div>
               <div className="stat-item">
@@ -229,7 +229,7 @@ export default function Dashboard() {
                   {quickStats.completionRate}%
                 </div>
                 <div className="stat-label">
-                  {(user.role === 'admin' || user.role === 'kepala_bps') ? 'Tingkat Kelengkapan' : 'Progress Sertifikat'}
+                  {user.role === 'admin' ? 'Tingkat Kelengkapan' : 'Progress Sertifikat'}
                 </div>
               </div>
             </div>

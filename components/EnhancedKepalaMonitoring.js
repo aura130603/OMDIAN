@@ -1,4 +1,5 @@
 import { useState, useContext, useEffect } from 'react'
+import { useRouter } from 'next/router'
 import { AuthContext } from '../context/AuthContext'
 import ProfileDropdown from './ProfileDropdown'
 import YearFilter from './YearFilter'
@@ -6,7 +7,9 @@ import { exportEmployeeReport, exportTrainingReport, exportMonitoringReport, vie
 
 export default function EnhancedKepalaMonitoring({ user }) {
   const { getAllUsers, getAllTrainingData } = useContext(AuthContext)
+  const router = useRouter()
   const [activeTab, setActiveTab] = useState('all-training')
+  const [hoveredTab, setHoveredTab] = useState(null)
   const [allUsers, setAllUsers] = useState([])
   const [allTraining, setAllTraining] = useState([])
   const [searchTerm, setSearchTerm] = useState('')
@@ -158,7 +161,16 @@ export default function EnhancedKepalaMonitoring({ user }) {
       <div className="dashboard-header">
         <div className="container">
           <div className="dashboard-nav">
-            <h1 className="dashboard-title">OMDIAN - Monitoring Kompetensi Kepala BPS</h1>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+              <button
+                onClick={() => router.push('/dashboard')}
+                className="btn btn-secondary"
+                style={{ padding: '8px 16px', fontSize: '14px' }}
+              >
+                ← Kembali
+              </button>
+              <h1 className="dashboard-title">OMDIAN - Monitoring Kompetensi Kepala BPS</h1>
+            </div>
             <div className="dashboard-user">
               <ProfileDropdown user={user} />
             </div>
@@ -184,13 +196,16 @@ export default function EnhancedKepalaMonitoring({ user }) {
                 padding: '12px 24px',
                 border: 'none',
                 borderRadius: '8px',
-                backgroundColor: activeTab === 'all-training' ? 'var(--primary)' : 'transparent',
-                color: activeTab === 'all-training' ? 'white' : 'var(--text-medium)',
+                backgroundColor: activeTab === 'all-training' ? '#CBD2A4' : (hoveredTab === 'all-training' ? 'white' : 'transparent'),
+                color: '#54473F',
                 fontWeight: activeTab === 'all-training' ? '600' : '500',
                 fontSize: '14px',
                 cursor: 'pointer',
-                transition: 'all 0.2s ease'
+                transition: 'all 0.2s ease',
+                boxShadow: hoveredTab === 'all-training' || activeTab === 'all-training' ? '0 4px 10px rgba(84,71,63,0.15)' : 'none'
               }}
+              onMouseEnter={() => setHoveredTab('all-training')}
+              onMouseLeave={() => setHoveredTab(null)}
               onClick={() => setActiveTab('all-training')}
             >
               📚 Semua Data Pelatihan
@@ -201,13 +216,16 @@ export default function EnhancedKepalaMonitoring({ user }) {
                 padding: '12px 24px',
                 border: 'none',
                 borderRadius: '8px',
-                backgroundColor: activeTab === 'employee-analysis' ? 'var(--primary)' : 'transparent',
-                color: activeTab === 'employee-analysis' ? 'white' : 'var(--text-medium)',
+                backgroundColor: activeTab === 'employee-analysis' ? '#CBD2A4' : (hoveredTab === 'employee-analysis' ? 'white' : 'transparent'),
+                color: '#54473F',
                 fontWeight: activeTab === 'employee-analysis' ? '600' : '500',
                 fontSize: '14px',
                 cursor: 'pointer',
-                transition: 'all 0.2s ease'
+                transition: 'all 0.2s ease',
+                boxShadow: hoveredTab === 'employee-analysis' || activeTab === 'employee-analysis' ? '0 4px 10px rgba(84,71,63,0.15)' : 'none'
               }}
+              onMouseEnter={() => setHoveredTab('employee-analysis')}
+              onMouseLeave={() => setHoveredTab(null)}
               onClick={() => setActiveTab('employee-analysis')}
             >
               👥 Analisis Pegawai
@@ -218,13 +236,16 @@ export default function EnhancedKepalaMonitoring({ user }) {
                 padding: '12px 24px',
                 border: 'none',
                 borderRadius: '8px',
-                backgroundColor: activeTab === 'reports' ? 'var(--primary)' : 'transparent',
-                color: activeTab === 'reports' ? 'white' : 'var(--text-medium)',
+                backgroundColor: activeTab === 'reports' ? '#CBD2A4' : (hoveredTab === 'reports' ? 'white' : 'transparent'),
+                color: '#54473F',
                 fontWeight: activeTab === 'reports' ? '600' : '500',
                 fontSize: '14px',
                 cursor: 'pointer',
-                transition: 'all 0.2s ease'
+                transition: 'all 0.2s ease',
+                boxShadow: hoveredTab === 'reports' || activeTab === 'reports' ? '0 4px 10px rgba(84,71,63,0.15)' : 'none'
               }}
+              onMouseEnter={() => setHoveredTab('reports')}
+              onMouseLeave={() => setHoveredTab(null)}
               onClick={() => setActiveTab('reports')}
             >
               📋 Laporan Lanjutan
@@ -336,119 +357,73 @@ export default function EnhancedKepalaMonitoring({ user }) {
                 </div>
               </div>
 
-              {/* Modern Card-based Data Display */}
-              <div style={{ display: 'grid', gap: '16px' }}>
-                {filteredTraining.map((training) => (
-                  <div key={training.id} style={{
-                    backgroundColor: '#fafbfc',
-                    border: '1px solid #e1e5e9',
-                    borderRadius: '12px',
-                    padding: '20px',
-                    transition: 'all 0.2s ease',
-                    cursor: 'default'
-                  }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: '2fr 3fr 1fr', gap: '20px', alignItems: 'start' }}>
-                      {/* Employee Info */}
-                      <div>
-                        <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--primary-darkest)', marginBottom: '4px' }}>
-                          {training.pegawaiNama}
-                        </div>
-                        <div style={{ fontSize: '13px', color: 'var(--text-medium)', marginBottom: '2px' }}>
-                          {training.pegawaiNIP}
-                        </div>
-                        <div style={{ fontSize: '12px', color: 'var(--text-medium)' }}>
-                          {training.pegawaiJabatan}
-                        </div>
-                      </div>
-
-                      {/* Training Details */}
-                      <div>
-                        <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--primary-darkest)', marginBottom: '8px' }}>
-                          {training.tema}
-                        </div>
-                        <div style={{ fontSize: '14px', color: 'var(--text-medium)', marginBottom: '6px' }}>
-                          📍 {training.penyelenggara}
-                        </div>
-                        <div style={{ fontSize: '13px', color: 'var(--text-medium)', marginBottom: '6px' }}>
-                          📅 {formatDate(training.tanggalMulai)} - {formatDate(training.tanggalSelesai)}
-                        </div>
-                        <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--primary)' }}>
-                          ⏱️ {training.keterangan ? `${training.keterangan} jam` : 'Belum diisi'}
-                        </div>
-                      </div>
-
-                      {/* Status & Actions */}
-                      <div style={{ textAlign: 'right' }}>
-                        <div style={{ marginBottom: '12px' }}>
-                          {training.sertifikat ? (
-                            <span style={{
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: '6px',
-                              padding: '6px 12px',
-                              backgroundColor: '#e7f5e7',
-                              color: '#2d7d2d',
-                              borderRadius: '8px',
-                              fontSize: '12px',
-                              fontWeight: '500'
-                            }}>
-                              ✅ Lengkap
+              {/* Tabel Data Pelatihan */}
+              {filteredTraining.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--text-medium)' }}>
+                  <div style={{ fontSize: '48px', marginBottom: '16px' }}>📚</div>
+                  <h3 style={{ marginBottom: '8px', color: 'var(--primary-darkest)' }}>
+                    Tidak ada data pelatihan
+                  </h3>
+                  <p style={{ margin: '0' }}>
+                    Coba ubah filter atau kata kunci pencarian
+                  </p>
+                </div>
+              ) : (
+                <div style={{ overflowX: 'auto' }}>
+                  <table className="training-table">
+                    <thead>
+                      <tr>
+                        <th>Pegawai</th>
+                        <th>Tema Pelatihan</th>
+                        <th>Penyelenggara</th>
+                        <th>Tanggal</th>
+                        <th>Jam Pelajaran</th>
+                        <th>Status</th>
+                        <th>Sertifikat</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredTraining.map((training) => (
+                        <tr key={training.id}>
+                          <td>
+                            <strong>{training.pegawaiNama}</strong><br />
+                            <small style={{ color: 'var(--text-medium)' }}>{training.pegawaiNIP}</small>
+                          </td>
+                          <td><strong>{training.tema}</strong></td>
+                          <td>{training.penyelenggara}</td>
+                          <td>
+                            {formatDate(training.tanggalMulai)}<br />
+                            <small style={{ color: 'var(--text-medium)' }}>s.d. {formatDate(training.tanggalSelesai)}</small>
+                          </td>
+                          <td>
+                            <span style={{ fontWeight: 'bold', color: 'var(--primary)' }}>
+                              {training.keterangan ? `${training.keterangan} jam` : '-'}
                             </span>
-                          ) : (
-                            <span style={{
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: '6px',
-                              padding: '6px 12px',
-                              backgroundColor: '#fff3cd',
-                              color: '#856404',
-                              borderRadius: '8px',
-                              fontSize: '12px',
-                              fontWeight: '500'
-                            }}>
-                              ⏳ Perlu Sertifikat
+                          </td>
+                          <td>
+                            <span className={`status-badge ${training.sertifikat ? 'status-active' : 'status-inactive'}`}>
+                              {training.sertifikat ? 'Lengkap' : 'Perlu Sertifikat'}
                             </span>
-                          )}
-                        </div>
-                        {training.sertifikat && (
-                          <button
-                            onClick={() => viewCertificate(training.sertifikat)}
-                            style={{
-                              padding: '8px 16px',
-                              backgroundColor: 'var(--primary)',
-                              color: 'white',
-                              border: 'none',
-                              borderRadius: '6px',
-                              fontSize: '12px',
-                              fontWeight: '500',
-                              cursor: 'pointer',
-                              transition: 'all 0.2s ease'
-                            }}
-                          >
-                            📄 Lihat Sertifikat
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-
-                {filteredTraining.length === 0 && (
-                  <div style={{
-                    textAlign: 'center',
-                    padding: '60px 20px',
-                    color: 'var(--text-medium)'
-                  }}>
-                    <div style={{ fontSize: '48px', marginBottom: '16px' }}>📚</div>
-                    <h3 style={{ marginBottom: '8px', color: 'var(--primary-darkest)' }}>
-                      Tidak ada data pelatihan
-                    </h3>
-                    <p style={{ margin: '0' }}>
-                      Coba ubah filter atau kata kunci pencarian
-                    </p>
-                  </div>
-                )}
-              </div>
+                          </td>
+                          <td>
+                            {training.sertifikat ? (
+                              <button
+                                className="btn btn-small btn-info"
+                                onClick={() => viewCertificate(training.sertifikat)}
+                                title="Lihat Sertifikat"
+                              >
+                                📄 Lihat
+                              </button>
+                            ) : (
+                              <span style={{ color: 'var(--text-medium)' }}>-</span>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
           )}
 
@@ -470,7 +445,7 @@ export default function EnhancedKepalaMonitoring({ user }) {
                     marginBottom: '8px',
                     margin: '0 0 8px 0'
                   }}>
-                    Analisis Kinerja Pegawai
+                    Analisis Kerja Pegawai
                   </h2>
                   <p style={{
                     color: 'var(--text-medium)',
@@ -499,163 +474,77 @@ export default function EnhancedKepalaMonitoring({ user }) {
                 </div>
               </div>
 
-              {/* Employee Cards Grid */}
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))',
-                gap: '20px'
-              }}>
-                {employeeAnalysis
-                  .filter(emp =>
-                    emp.nama.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    emp.nip.includes(searchTerm) ||
-                    emp.jabatan.toLowerCase().includes(searchTerm.toLowerCase())
-                  )
-                  .map((employee) => (
-                    <div key={employee.id} style={{
-                      backgroundColor: '#fafbfc',
-                      border: '1px solid #e1e5e9',
-                      borderRadius: '12px',
-                      padding: '20px',
-                      transition: 'all 0.2s ease'
-                    }}>
-                      {/* Employee Header */}
-                      <div style={{ marginBottom: '16px', borderBottom: '1px solid #e1e5e9', paddingBottom: '16px' }}>
-                        <div style={{ fontSize: '18px', fontWeight: '600', color: 'var(--primary-darkest)', marginBottom: '4px' }}>
-                          {employee.nama}
-                        </div>
-                        <div style={{ fontSize: '13px', color: 'var(--text-medium)', marginBottom: '2px' }}>
-                          {employee.nip}
-                        </div>
-                        <div style={{ fontSize: '13px', color: 'var(--text-medium)' }}>
-                          {employee.jabatan}
-                        </div>
-                        <div style={{ marginTop: '8px' }}>
-                          <span style={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '6px',
-                            padding: '4px 8px',
-                            backgroundColor: employee.status === 'Aktif' ? '#e7f5e7' : '#fff3cd',
-                            color: employee.status === 'Aktif' ? '#2d7d2d' : '#856404',
-                            borderRadius: '6px',
-                            fontSize: '12px',
-                            fontWeight: '500'
-                          }}>
-                            {employee.status === 'Aktif' ? '✅' : '⚠️'} {employee.status}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Statistics Grid */}
-                      <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(2, 1fr)',
-                        gap: '16px',
-                        marginBottom: '16px'
-                      }}>
-                        <div style={{ textAlign: 'center' }}>
-                          <div style={{
-                            fontSize: '24px',
-                            fontWeight: '700',
-                            color: employee.totalTraining > 0 ? 'var(--success)' : 'var(--warning)',
-                            marginBottom: '4px'
-                          }}>
-                            {employee.totalTraining}
-                          </div>
-                          <div style={{ fontSize: '12px', color: 'var(--text-medium)' }}>Total Pelatihan</div>
-                        </div>
-                        <div style={{ textAlign: 'center' }}>
-                          <div style={{
-                            fontSize: '24px',
-                            fontWeight: '700',
-                            color: employee.thisYearTraining > 0 ? 'var(--success)' : 'var(--error)',
-                            marginBottom: '4px'
-                          }}>
-                            {employee.thisYearTraining}
-                          </div>
-                          <div style={{ fontSize: '12px', color: 'var(--text-medium)' }}>Tahun Ini</div>
-                        </div>
-                        <div style={{ textAlign: 'center' }}>
-                          <div style={{
-                            fontSize: '20px',
-                            fontWeight: '700',
-                            color: 'var(--primary)',
-                            marginBottom: '4px'
-                          }}>
-                            {employee.totalHours}
-                          </div>
-                          <div style={{ fontSize: '12px', color: 'var(--text-medium)' }}>Total Jam</div>
-                        </div>
-                        <div style={{ textAlign: 'center' }}>
-                          <div style={{
-                            fontSize: '20px',
-                            fontWeight: '700',
-                            color: employee.thisYearHours > 0 ? 'var(--success)' : 'var(--error)',
-                            marginBottom: '4px'
-                          }}>
-                            {employee.thisYearHours}
-                          </div>
-                          <div style={{ fontSize: '12px', color: 'var(--text-medium)' }}>Jam Tahun Ini</div>
-                        </div>
-                      </div>
-
-                      {/* Additional Info */}
-                      <div style={{
-                        backgroundColor: 'white',
-                        padding: '12px',
-                        borderRadius: '8px',
-                        fontSize: '13px'
-                      }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                          <span style={{ color: 'var(--text-medium)' }}>Sertifikat:</span>
-                          <span style={{ fontWeight: '600' }}>
-                            {employee.withCertificate} ({employee.certificateRate}%)
-                          </span>
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                          <span style={{ color: 'var(--text-medium)' }}>Penyelenggara:</span>
-                          <span style={{ fontWeight: '600', color: 'var(--info)' }}>
-                            {employee.uniqueOrganizers}
-                          </span>
-                        </div>
-                        {employee.lastTraining && (
-                          <div style={{ marginTop: '12px', paddingTop: '8px', borderTop: '1px solid #e1e5e9' }}>
-                            <div style={{ fontSize: '12px', color: 'var(--text-medium)', marginBottom: '4px' }}>
-                              Pelatihan Terakhir:
-                            </div>
-                            <div style={{ fontSize: '12px', fontWeight: '600', marginBottom: '2px' }}>
-                              {employee.lastTraining.tema}
-                            </div>
-                            <div style={{ fontSize: '11px', color: 'var(--text-medium)' }}>
-                              {formatDate(employee.lastTraining.tanggalMulai)}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-              </div>
-
-              {employeeAnalysis.filter(emp =>
-                emp.nama.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                emp.nip.includes(searchTerm) ||
-                emp.jabatan.toLowerCase().includes(searchTerm.toLowerCase())
-              ).length === 0 && (
-                <div style={{
-                  textAlign: 'center',
-                  padding: '60px 20px',
-                  color: 'var(--text-medium)'
-                }}>
-                  <div style={{ fontSize: '48px', marginBottom: '16px' }}>👥</div>
-                  <h3 style={{ marginBottom: '8px', color: 'var(--primary-darkest)' }}>
-                    Tidak ada pegawai ditemukan
-                  </h3>
-                  <p style={{ margin: '0' }}>
-                    Coba ubah kata kunci pencarian
-                  </p>
-                </div>
-              )}
+              {/* Tabel Analisis Pegawai */}
+              {employeeAnalysis
+                .filter(emp =>
+                  emp.nama.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                  emp.nip.includes(searchTerm) ||
+                  emp.jabatan.toLowerCase().includes(searchTerm.toLowerCase())
+                ).length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--text-medium)' }}>
+                    <div style={{ fontSize: '48px', marginBottom: '16px' }}>👥</div>
+                    <h3 style={{ marginBottom: '8px', color: 'var(--primary-darkest)' }}>
+                      Tidak ada pegawai ditemukan
+                    </h3>
+                    <p style={{ margin: '0' }}>
+                      Coba ubah kata kunci pencarian
+                    </p>
+                  </div>
+                ) : (
+                  <div style={{ overflowX: 'auto' }}>
+                    <table className="training-table">
+                      <thead>
+                        <tr>
+                          <th>NIP</th>
+                          <th>Nama</th>
+                          <th>Jabatan</th>
+                          <th>Total Pelatihan</th>
+                          <th>Total Jam Tahun Ini</th>
+                          <th>Sertifikat</th>
+                          <th>Progres Sertifikat</th>
+                          <th>Pelatihan Terakhir</th>
+                          <th>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {employeeAnalysis
+                          .filter(emp =>
+                            emp.nama.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                            emp.nip.includes(searchTerm) ||
+                            emp.jabatan.toLowerCase().includes(searchTerm.toLowerCase())
+                          )
+                          .map((emp) => (
+                            <tr key={emp.id}>
+                              <td>{emp.nip}</td>
+                              <td><strong>{emp.nama}</strong></td>
+                              <td>{emp.jabatan}</td>
+                              <td>{emp.totalTraining}</td>
+                              <td>{emp.thisYearHours}</td>
+                              <td>{emp.withCertificate}</td>
+                              <td>{emp.certificateRate}%</td>
+                              <td>
+                                {emp.lastTraining ? (
+                                  <>
+                                    {emp.lastTraining.tema}<br />
+                                    <small style={{ color: 'var(--text-medium)' }}>
+                                      {formatDate(emp.lastTraining.tanggalMulai)}
+                                    </small>
+                                  </>
+                                ) : (
+                                  <span style={{ color: 'var(--text-medium)' }}>-</span>
+                                )}
+                              </td>
+                              <td>
+                                <span className={`status-badge ${emp.status === 'Aktif' ? 'status-active' : 'status-inactive'}`}>
+                                  {emp.status}
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
             </div>
           )}
 

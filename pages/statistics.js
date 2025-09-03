@@ -26,7 +26,7 @@ export default function Statistics() {
     if (user) {
       const loadStatisticsData = async () => {
         try {
-          if (user.role === 'admin' || user.role === 'kepala_bps') {
+          if (user.role === 'admin') {
             const users = await getAllUsers()
             const training = await getAllTrainingData()
             setAllUsers(users)

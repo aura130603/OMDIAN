@@ -151,7 +151,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     try {
-      let url = `/api/training?userId=${user.id}&role=${user.role}`
+      let url = `/api/training?userId=${user.id}&role=${user.role}&scope=all`
       if (year !== null) {
         url += `&year=${year}`
       }

@@ -61,7 +61,7 @@ const DUMMY_TRAINING_DATA = [
 export function getFallbackTrainingData(userId, role) {
   const mapTrainingData = (training) => ({
     id: training.id,
-    pegawaiId: training.user_id,
+    userId: training.user_id,
     pegawaiNama: training.pegawai_nama,
     pegawaiNIP: training.pegawai_nip,
     tema: training.tema,

@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs'
 import { executeQuery } from '../../../lib/db'
+import { DUMMY_USERS } from '../users/dummy-operations'
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -36,55 +37,60 @@ export default async function handler(req, res) {
 
     // Query user from database
     const query = `
-      SELECT 
-        id, username, password, nip, nama, pangkat, golongan, jabatan, 
-        pendidikan, nilai_skp, hukuman_disiplin, diklat_pim, diklat_fungsional, 
+      SELECT
+        id, username, password, nip, nama, pangkat, golongan, jabatan,
+        pendidikan, nilai_skp, hukuman_disiplin, diklat_pim, diklat_fungsional,
         role, status
-      FROM users 
+      FROM users
       WHERE username = ? AND status = 'aktif'
     `
 
     const result = await executeQuery(query, [username])
 
-    if (!result.success) {
-      console.error('Database error during login:', result.error)
-      return res.status(500).json({
-        success: false,
-        message: 'Terjadi kesalahan server'
+    let user = null
+
+    if (result.success && result.data.length > 0) {
+      user = result.data[0]
+      // Verify password
+      const isPasswordValid = await bcrypt.compare(password, user.password)
+      if (!isPasswordValid) {
+        return res.status(401).json({
+          success: false,
+          message: 'Username atau password salah'
+        })
+      }
+
+      const { password: _dbPass, ...safeUser } = user
+      console.log('✅ Login successful from database:', safeUser.username)
+      return res.status(200).json({
+        success: true,
+        user: safeUser,
+        message: 'Login berhasil'
       })
     }
 
-    if (result.data.length === 0) {
+    // Fallback to dummy users when DB is unavailable or user not found
+    const fallbackUser = DUMMY_USERS.find(u => u.username === username && u.status === 'aktif')
+    if (!fallbackUser) {
       return res.status(401).json({
         success: false,
         message: 'Username atau password salah'
       })
     }
 
-    const user = result.data[0]
-
-    // Verify password
-    const isPasswordValid = await bcrypt.compare(password, user.password)
-
-    if (!isPasswordValid) {
+    if (fallbackUser.password !== password) {
       return res.status(401).json({
         success: false,
         message: 'Username atau password salah'
       })
     }
 
-    // Remove password from response
-    const { password: _, ...userWithoutPassword } = user
-
-    // Use user data without unwanted fields
-    const userResponse = userWithoutPassword
-
-    console.log('✅ Login successful from database:', userResponse.username)
-
-    res.status(200).json({
+    const { password: _dummyPass, ...safeDummy } = fallbackUser
+    console.log('✅ Login successful with fallback data:', safeDummy.username)
+    return res.status(200).json({
       success: true,
-      user: userResponse,
-      message: 'Login berhasil'
+      user: safeDummy,
+      message: 'Login berhasil (mode demo)'
     })
 
   } catch (error) {

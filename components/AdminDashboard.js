@@ -185,10 +185,10 @@ export default function AdminDashboard({ user }) {
                       </thead>
                       <tbody>
                         {allUsers.map((pegawai) => {
-                          const trainingCount = allTraining.filter(t => t.pegawaiId === pegawai.id).length
+                          const trainingCount = allTraining.filter(t => t.userId === pegawai.id).length
                           const thisYearCount = allTraining.filter(t => {
                             const year = new Date(t.tanggalMulai).getFullYear()
-                            return t.pegawaiId === pegawai.id && year === new Date().getFullYear()
+                            return t.userId === pegawai.id && year === new Date().getFullYear()
                           }).length
 
                           return (

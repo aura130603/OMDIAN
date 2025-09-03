@@ -1,16 +1,22 @@
 import { useState, useContext, useEffect } from 'react'
+import { useRouter } from 'next/router'
 import { AuthContext } from '../context/AuthContext'
 import ProfileDropdown from './ProfileDropdown'
 import YearFilter from './YearFilter'
 import { exportEmployeeReport, exportTrainingReport, exportMonitoringReport, viewCertificate } from '../utils/exportUtils'
+import Pagination from './Pagination'
 
 export default function KepalaMonitoringDashboard({ user }) {
   const { getAllUsers, getAllTrainingData } = useContext(AuthContext)
+  const router = useRouter()
   const [activeTab, setActiveTab] = useState('overview')
   const [allUsers, setAllUsers] = useState([])
   const [allTraining, setAllTraining] = useState([])
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedYear, setSelectedYear] = useState(null)
+  const [pageProgress, setPageProgress] = useState(1)
+  const [pageHours, setPageHours] = useState(1)
+  const pageSize = 10
 
   useEffect(() => {
     if (user && user.role === 'kepala_bps') {
@@ -114,7 +120,16 @@ export default function KepalaMonitoringDashboard({ user }) {
       <div className="dashboard-header">
         <div className="container">
           <div className="dashboard-nav">
-            <h1 className="dashboard-title">OMDIAN - Monitoring Kepala BPS</h1>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+              <button
+                onClick={() => router.push('/dashboard')}
+                className="btn btn-secondary"
+                style={{ padding: '8px 16px', fontSize: '14px' }}
+              >
+                ← Kembali
+              </button>
+              <h1 className="dashboard-title">OMDIAN - Monitoring Kepala BPS</h1>
+            </div>
             <div className="dashboard-user">
               <ProfileDropdown user={user} />
             </div>
@@ -259,11 +274,12 @@ export default function KepalaMonitoringDashboard({ user }) {
                   </thead>
                   <tbody>
                     {employeeProgress
-                      .filter(emp => 
+                      .filter(emp =>
                         emp.nama.toLowerCase().includes(searchTerm.toLowerCase()) ||
                         emp.nip.includes(searchTerm) ||
                         emp.jabatan.toLowerCase().includes(searchTerm.toLowerCase())
                       )
+                      .slice((pageProgress - 1) * pageSize, pageProgress * pageSize)
                       .map((employee) => (
                       <tr key={employee.id}>
                         <td>

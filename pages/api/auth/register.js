@@ -60,16 +60,41 @@ export default async function handler(req, res) {
     const existingUser = await executeQuery(checkQuery, [username, nip])
 
     if (!existingUser.success) {
-      return res.status(500).json({
-        success: false,
-        message: 'Gagal memeriksa data existing'
+      // Fallback to in-memory demo registration
+      const { DUMMY_USERS } = await import('../users/dummy-operations')
+      const exists = DUMMY_USERS.some(u => u.username === username || u.nip === nip)
+      if (exists) {
+        return res.status(409).json({
+          success: false,
+          message: 'Username atau NIP sudah digunakan'
+        })
+      }
+      const newId = Math.max(...DUMMY_USERS.map(u => u.id)) + 1
+      DUMMY_USERS.push({
+        id: newId,
+        username,
+        password, // stored plain for demo consistency
+        nip,
+        nama,
+        pangkat,
+        golongan,
+        jabatan,
+        pendidikan,
+        role: 'pegawai',
+        status: 'aktif',
+        created_at: new Date().toISOString()
+      })
+      console.log('✅ Registration successful in fallback mode:', username)
+      return res.status(201).json({
+        success: true,
+        message: 'Registrasi berhasil (mode demo). Silakan login.'
       })
     }
 
     if (existingUser.data.length > 0) {
-      return res.status(409).json({ 
-        success: false, 
-        message: 'Username atau NIP sudah digunakan' 
+      return res.status(409).json({
+        success: false,
+        message: 'Username atau NIP sudah digunakan'
       })
     }
 

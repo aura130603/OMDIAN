@@ -12,7 +12,13 @@ export const AuthProvider = ({ children }) => {
       if (typeof window !== 'undefined') {
         const savedUser = localStorage.getItem('omdian_user')
         if (savedUser) {
-          setUser(JSON.parse(savedUser))
+          try {
+            const parsed = JSON.parse(savedUser)
+            setUser(parsed)
+          } catch (e) {
+            console.error('Corrupted user in localStorage, clearing key:', e)
+            localStorage.removeItem('omdian_user')
+          }
         }
       }
     } catch (error) {

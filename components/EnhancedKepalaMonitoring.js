@@ -164,10 +164,14 @@ export default function EnhancedKepalaMonitoring({ user }) {
             <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
               <button
                 onClick={() => router.push('/dashboard')}
-                className="btn btn-secondary"
-                style={{ padding: '8px 16px', fontSize: '14px' }}
+                className="nav-back-button"
+                aria-label="Kembali"
+                title="Kembali"
               >
-                ← Kembali
+                <svg className="nav-back-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M15 6l-6 6 6 6" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                <span className="sr-only">Kembali</span>
               </button>
               <h1 className="dashboard-title">OMDIAN - Monitoring Kompetensi Kepala BPS</h1>
             </div>
@@ -616,10 +620,11 @@ export default function EnhancedKepalaMonitoring({ user }) {
                 marginBottom: '32px'
               }}>
                 <div style={{
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  // background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  background: '#FFC6C6',
                   borderRadius: '16px',
                   padding: '24px',
-                  color: 'white',
+                  color: 'black',
                   position: 'relative',
                   overflow: 'hidden'
                 }}>
@@ -637,7 +642,7 @@ export default function EnhancedKepalaMonitoring({ user }) {
                         width: '100%',
                         padding: '12px 24px',
                         backgroundColor: 'rgba(255,255,255,0.2)',
-                        color: 'white',
+                        color: 'black',
                         border: '1px solid rgba(255,255,255,0.3)',
                         borderRadius: '8px',
                         fontSize: '14px',
@@ -652,10 +657,11 @@ export default function EnhancedKepalaMonitoring({ user }) {
                 </div>
 
                 <div style={{
-                  background: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)',
+                  // background: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)',
+                  background: '#9ECAD6',
                   borderRadius: '16px',
                   padding: '24px',
-                  color: 'white',
+                  color: 'black',
                   position: 'relative',
                   overflow: 'hidden'
                 }}>
@@ -673,7 +679,7 @@ export default function EnhancedKepalaMonitoring({ user }) {
                         width: '100%',
                         padding: '12px 24px',
                         backgroundColor: 'rgba(255,255,255,0.2)',
-                        color: 'white',
+                        color: 'black',
                         border: '1px solid rgba(255,255,255,0.3)',
                         borderRadius: '8px',
                         fontSize: '14px',
@@ -688,10 +694,11 @@ export default function EnhancedKepalaMonitoring({ user }) {
                 </div>
 
                 <div style={{
-                  background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                  // background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                  background: '#EAC8A6',
                   borderRadius: '16px',
                   padding: '24px',
-                  color: 'white',
+                  color: 'black',
                   position: 'relative',
                   overflow: 'hidden'
                 }}>
@@ -709,7 +716,7 @@ export default function EnhancedKepalaMonitoring({ user }) {
                         width: '100%',
                         padding: '12px 24px',
                         backgroundColor: 'rgba(255,255,255,0.2)',
-                        color: 'white',
+                        color: 'black',
                         border: '1px solid rgba(255,255,255,0.3)',
                         borderRadius: '8px',
                         fontSize: '14px',
@@ -757,7 +764,7 @@ export default function EnhancedKepalaMonitoring({ user }) {
                         justifyContent: 'center',
                         marginRight: '12px'
                       }}>
-                        {stats.completionRate >= 80 ? '✅' : stats.completionRate >= 60 ? '⚠️' : '🚨'}
+                        {stats.completionRate >= 80 ? '✅' : stats.completionRate >= 60 ? '���️' : '🚨'}
                       </div>
                       <div>
                         <h4 style={{ fontSize: '16px', fontWeight: '600', margin: '0 0 4px 0', color: 'var(--primary-darkest)' }}>

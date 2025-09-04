@@ -3,6 +3,7 @@ import { useRouter } from 'next/router'
 import { AuthContext } from '../context/AuthContext'
 import ProfileDropdown from '../components/ProfileDropdown'
 import EmployeeModal from '../components/EmployeeModal'
+import YearFilter from '../components/YearFilter'
 
 export default function EmployeeManagement() {
   const { user, loading, getAllUsers, addUser, updateUser, deleteUser, getAllTrainingData } = useContext(AuthContext)
@@ -12,7 +13,7 @@ export default function EmployeeManagement() {
   const [showModal, setShowModal] = useState(false)
   const [editingEmployee, setEditingEmployee] = useState(null)
   const [searchTerm, setSearchTerm] = useState('')
-  // Removed filters state as filters are no longer needed
+  const [selectedYear, setSelectedYear] = useState(null)
 
   useEffect(() => {
     if (!loading && (!user || (user.role !== 'admin' && user.role !== 'kepala_bps'))) {
@@ -25,7 +26,7 @@ export default function EmployeeManagement() {
       const loadEmployeeData = async () => {
         try {
           const users = await getAllUsers()
-          const training = await getAllTrainingData()
+          const training = await getAllTrainingData(selectedYear)
           setAllUsers(users)
           setAllTraining(training)
         } catch (error) {
@@ -36,7 +37,7 @@ export default function EmployeeManagement() {
       }
       loadEmployeeData()
     }
-  }, [user, getAllUsers, getAllTrainingData])
+  }, [user, selectedYear, getAllUsers, getAllTrainingData])
 
   const handleAddEmployee = () => {
     setEditingEmployee(null)
@@ -131,9 +132,6 @@ export default function EmployeeManagement() {
   }
 
   const filteredEmployees = getFilteredEmployees()
-  const currentYear = new Date().getFullYear()
-  
-  // Removed unique values for filters as they are no longer needed
 
   if (loading) {
     return (
@@ -163,12 +161,16 @@ export default function EmployeeManagement() {
         <div className="container">
           <div className="dashboard-nav">
             <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-              <button 
+              <button
                 onClick={() => router.push('/dashboard')}
-                className="btn btn-secondary"
-                style={{ padding: '8px 16px', fontSize: '14px' }}
+                className="nav-back-button"
+                aria-label="Kembali"
+                title="Kembali"
               >
-                ← Kembali
+                <svg className="nav-back-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M15 6l-6 6 6 6" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                <span className="sr-only">Kembali</span>
               </button>
               <h1 className="dashboard-title">
                 {user.role === 'admin' ? 'Kelola Data Pegawai' : 'Data Pegawai BPS'}
@@ -185,75 +187,33 @@ export default function EmployeeManagement() {
         <div className="dashboard-content">
           <div className="card">
             <div className="card-header">
-              {/* Single row with title, search, and add button */}
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '20px',
-                marginBottom: '24px'
-              }}>
-                <h2 className="card-title" style={{ margin: 0, minWidth: 'fit-content' }}>
-                  Data Pegawai ({filteredEmployees.length})
-                </h2>
-
-                <div style={{ flex: 1, maxWidth: '400px' }}>
-                  <input
-                    type="text"
-                    placeholder="🔍 Cari nama, NIP, jabatan..."
-                    className="form-input"
-                    style={{
-                      marginBottom: '0',
-                      paddingLeft: '12px',
-                      fontSize: '14px',
-                      border: '1.5px solid var(--border-color)',
-                      borderRadius: '8px',
-                      transition: 'all 0.2s ease',
-                      width: '100%'
-                    }}
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    onFocus={(e) => {
-                      e.target.style.borderColor = 'var(--primary-medium)'
-                      e.target.style.boxShadow = '0 0 0 3px rgba(203, 210, 164, 0.1)'
-                    }}
-                    onBlur={(e) => {
-                      e.target.style.borderColor = 'var(--border-color)'
-                      e.target.style.boxShadow = 'none'
-                    }}
-                  />
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                <div>
+                  <h2 className="card-title" style={{ margin: 0 }}>
+                    Data Pegawai ({filteredEmployees.length})
+                  </h2>
                 </div>
-
-                {user.role === 'admin' && (
-                  <button
-                    className="btn-add"
-                    onClick={handleAddEmployee}
-                    style={{
-                      padding: '10px 20px',
-                      fontSize: '14px',
-                      borderRadius: '6px',
-                      background: 'linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-medium) 100%)',
-                      color: 'white',
-                      border: 'none',
-                      cursor: 'pointer',
-                      fontWeight: '500',
-                      transition: 'all 0.2s ease',
-                      boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                      minWidth: 'fit-content',
-                      whiteSpace: 'nowrap'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.target.style.transform = 'translateY(-1px)'
-                      e.target.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)'
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.transform = 'translateY(0)'
-                      e.target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)'
-                    }}
-                  >
-                    + Tambah Pegawai
-                  </button>
-                )}
               </div>
+            </div>
+
+            <div className="control-panel">
+              <div style={{ flex: 1, minWidth: '250px' }}>
+                <input
+                  type="text"
+                  placeholder="🔍 Cari nama, NIP, atau jabatan..."
+                  className="control-input"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+              <div>
+                <YearFilter selectedYear={selectedYear} onYearChange={setSelectedYear} />
+              </div>
+              {user.role === 'admin' && (
+                <button className="btn-add" onClick={handleAddEmployee}>
+                  + Tambah Pegawai
+                </button>
+              )}
             </div>
 
             {filteredEmployees.length === 0 ? (
@@ -285,17 +245,13 @@ export default function EmployeeManagement() {
                       <th>Pangkat/Gol</th>
                       <th>Jabatan</th>
                       <th>Pendidikan</th>
-                      <th>SKP</th>
-                      <th>Status {currentYear}</th>
+                      <th>Status</th>
                       {user.role === 'admin' && <th>Aksi</th>}
                     </tr>
                   </thead>
                   <tbody>
                     {filteredEmployees.map((pegawai) => {
-                      const thisYearCount = allTraining.filter(t => {
-                        const year = new Date(t.tanggalMulai).getFullYear()
-                        return t.userId === pegawai.id && year === currentYear
-                      }).length
+                      const thisYearCount = allTraining.filter(t => t.userId === pegawai.id).length
 
                       return (
                         <tr key={pegawai.id}>
@@ -309,7 +265,6 @@ export default function EmployeeManagement() {
                           </td>
                           <td>{pegawai.jabatan}</td>
                           <td>{pegawai.pendidikan}</td>
-                          <td>{pegawai.nilaiSKP || '-'}</td>
                           <td>
                             <span className={`status-badge ${thisYearCount > 0 ? 'status-active' : 'status-inactive'}`}>
                               {thisYearCount > 0 ? `${thisYearCount} pelatihan` : 'Belum ada'}

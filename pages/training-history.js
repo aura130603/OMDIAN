@@ -151,13 +151,17 @@ export default function TrainingHistory() {
       <div className="dashboard-header">
         <div className="container">
           <div className="dashboard-nav">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-              <button 
+            <div className="nav-actions">
+              <button
                 onClick={() => router.push('/dashboard')}
-                className="btn btn-secondary"
-                style={{ padding: '8px 16px', fontSize: '14px' }}
+                className="nav-back-button"
+                aria-label="Kembali"
+                title="Kembali"
               >
-                ← Kembali
+                <svg className="nav-back-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M15 6l-6 6 6 6" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                <span className="sr-only">Kembali</span>
               </button>
               <h1 className="dashboard-title">Riwayat Diklat/Workshop/Seminar</h1>
             </div>
@@ -193,7 +197,7 @@ export default function TrainingHistory() {
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
                 </div>
-                {(user.role === 'employee' || user.role === 'kepala_bps') && (
+                {(user.role === 'pegawai' || user.role === 'employee' || user.role === 'kepala_bps') && (
                   <button className="btn-add" onClick={handleAddTraining}>
                     + Tambah Data
                   </button>
@@ -277,7 +281,7 @@ export default function TrainingHistory() {
                         </td>
                         <td>
                           <div style={{ display: 'flex', gap: '5px' }}>
-                            {(user.role === 'employee' || user.role === 'kepala_bps') ? (
+                            {(user.role === 'pegawai' || user.role === 'employee' || user.role === 'kepala_bps') ? (
                               <button
                                 className="btn btn-small btn-secondary"
                                 onClick={() => handleEditTraining(training)}

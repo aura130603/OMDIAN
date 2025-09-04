@@ -36,17 +36,18 @@ export default async function handler(req, res) {
       }
     })
 
-    // Parse the form
-    const [fields, files] = await form.parse(req)
+    // Parse the form (formidable v3 returns an object with fields and files)
+    const { fields, files } = await form.parse(req)
 
-    if (!files.certificate || files.certificate.length === 0) {
+    const uploaded = files.certificate
+    const file = Array.isArray(uploaded) ? uploaded[0] : uploaded
+
+    if (!file) {
       return res.status(400).json({
         success: false,
         message: 'No valid certificate file uploaded'
       })
     }
-
-    const file = files.certificate[0]
 
     // Generate new filename to avoid conflicts
     const fileExtension = path.extname(file.originalFilename || '')

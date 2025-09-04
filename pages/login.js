@@ -99,7 +99,7 @@ export default function Login() {
                 onClick={() => setShowPassword(v => !v)}
                 title={showPassword ? 'Sembunyikan password' : 'Tampilkan password'}
               >
-                {showPassword ? '🙈' : '👁️'}
+                {/* {showPassword ? '🙈' : '👁️'} */}
               </button>
             </div>
           </div>
@@ -119,14 +119,14 @@ export default function Login() {
           </button>
         </form>
 
-        <div className="auth-footer">
+        {/* <div className="auth-footer">
           Belum punya akun?
           <a href="/register" className="auth-link"> Daftar sekarang</a>
-        </div>
+        </div> */}
 
-        <div className="auth-demo-hint">
+        {/* <div className="auth-demo-hint">
           <strong>Demo:</strong> admin1/admin123 atau pegawai1/password123
-        </div>
+        </div> */}
 
       </div>
     </div>

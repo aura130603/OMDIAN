@@ -123,10 +123,14 @@ export default function KepalaMonitoringDashboard({ user }) {
             <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
               <button
                 onClick={() => router.push('/dashboard')}
-                className="btn btn-secondary"
-                style={{ padding: '8px 16px', fontSize: '14px' }}
+                className="nav-back-button"
+                aria-label="Kembali"
+                title="Kembali"
               >
-                ← Kembali
+                <svg className="nav-back-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M15 6l-6 6 6 6" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                <span className="sr-only">Kembali</span>
               </button>
               <h1 className="dashboard-title">OMDIAN - Monitoring Kepala BPS</h1>
             </div>

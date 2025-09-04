@@ -3,7 +3,12 @@
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
   "/login": "pages/login.js",
-  "/api/users": "pages/api/users.js",
   "/api/training": "pages/api/training.js",
-  "/employee-management": "pages/employee-management.js"
+  "/dashboard": "pages/dashboard.js",
+  "/training-history": "pages/training-history.js",
+  "/statistics": "pages/statistics.js",
+  "/api/users": "pages/api/users.js",
+  "/employee-management": "pages/employee-management.js",
+  "/enhanced-monitoring": "pages/enhanced-monitoring.js",
+  "/api/auth/login": "pages/api/auth/login.js"
 }

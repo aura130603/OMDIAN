@@ -177,32 +177,34 @@ export default function TrainingHistory() {
           <div className="card">
             <div className="card-header">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                  <h2 className="card-title">
+                <div>
+                  <h2 className="card-title" style={{ margin: 0 }}>
                     {user.role === 'admin' ? 'Semua Data Pelatihan' :
                      user.role === 'kepala_bps' ? 'Riwayat Pelatihan Kepala BPS' :
                      'Riwayat Pelatihan Anda'}
                     ({filteredTrainingData.length})
                   </h2>
-                  <YearFilter
-                    selectedYear={selectedYear}
-                    onYearChange={setSelectedYear}
-                  />
-                  <input
-                    type="text"
-                    placeholder="Cari pelatihan..."
-                    className="form-input"
-                    style={{ maxWidth: '300px', marginBottom: '0' }}
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
                 </div>
-                {(user.role === 'pegawai' || user.role === 'employee' || user.role === 'kepala_bps') && (
-                  <button className="btn-add" onClick={handleAddTraining}>
-                    + Tambah Data
-                  </button>
-                )}
               </div>
+            </div>
+            <div className="control-panel">
+              <div style={{ flex: 1, minWidth: '250px' }}>
+                <input
+                  type="text"
+                  placeholder="🔍 Cari tema atau penyelenggara..."
+                  className="control-input"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+              <div>
+                <YearFilter selectedYear={selectedYear} onYearChange={setSelectedYear} />
+              </div>
+              {(user.role === 'pegawai' || user.role === 'employee' || user.role === 'kepala_bps') && (
+                <button className="btn-add" onClick={handleAddTraining}>
+                  + Tambah Data
+                </button>
+              )}
             </div>
             
             {filteredTrainingData.length === 0 ? (

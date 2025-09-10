@@ -246,6 +246,22 @@ a {
   padding: 16px 24px;
 }
 
+.btn-small {
+  padding: 8px 12px;
+  /* font-size: 12px; */
+  border-radius: 6px;
+  width: auto;
+
+  background: rgba(203, 210, 164, 0.2);
+  color: var(--primary-darkest);
+  border: 2px solid rgba(203, 210, 164, 0.3);
+  backdrop-filter: blur(10px);
+  font-weight: 600;
+  /* border-radius: 12px; */
+  /* padding: 16px 24px; */
+}
+
+
 .btn-secondary:hover {
   background: rgba(203, 210, 164, 0.3);
   border-color: var(--primary-medium);
@@ -535,7 +551,8 @@ a {
 }
 .password-toggle:hover {
   color: var(--primary-darkest);
-  background-color: var(--primary-light);
+  /* background-color: var(--primary-light); */
+  background-color: var(--primary-dark);
 }
 
 .btn-small {
@@ -1282,4 +1299,27 @@ a {
 
 .year-filter-select:hover {
   border-color: var(--primary-dark);
+}
+
+
+.search-filter-container {
+  display: flex;
+  grid-template-columns: 1fr auto;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 12px;
+  max-width: 100%;
+  align-items: center;
+                flexWrap: 'wrap',
+               
+        
+}
+
+/* Media Query agar responsif */
+@media (max-width: 768px) {
+  .search-filter-container {
+    grid-template-columns: 1fr; /* jadi 1 kolom di layar kecil */
+  }
 }

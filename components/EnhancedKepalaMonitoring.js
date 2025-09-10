@@ -321,8 +321,8 @@ export default function EnhancedKepalaMonitoring({ user }) {
                   >
                     <option value="date">Tanggal</option>
                     <option value="employee">Pegawai</option>
-                    <option value="theme">Tema</option>
-                    <option value="organizer">Penyelenggara</option>
+                    {/* <option value="theme">Tema</option>
+                    <option value="organizer">Penyelenggara</option> */}
                     <option value="hours">Jam Pelajaran</option>
                   </select>
                 </div>
@@ -465,30 +465,98 @@ export default function EnhancedKepalaMonitoring({ user }) {
                     Analisis detail performance dan partisipasi pelatihan per pegawai
                   </p>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                </div>
+{/* 
+                <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                    gap: '20px',
+                    marginBottom: '32px',
+                    padding: '24px',
+                    backgroundColor: '#f8f9fa',
+                    borderRadius: '12px',
+                     maxWidth: '100%'
+                  }}>  */}
+                {/* <div style={{ flex: 1, minWidth: '250px' }}>
+                  <input
+                    type="text"
+                    placeholder="🔍 Cari pelatihan, pegawai, atau penyelenggara..."
+                    style={{
+                      width: '100%',
+                      padding: '10px 16px',
+                      border: '1px solid #e1e5e9',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      backgroundColor: 'white',
+                      outline: 'none'
+                    }}
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                      </div>
+                <div style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '12px',
+                  flexWrap: 'wrap' }}>
                   <YearFilter
                     selectedYear={selectedYear}
                     onYearChange={setSelectedYear}
                   />
-                  <div style={{ minWidth: '300px' }}>
-                    <input
-                      type="text"
-                      placeholder="🔍 Cari nama, NIP, atau jabatan..."
-                      style={{
-                        width: '100%',
-                        padding: '10px 16px',
-                        border: '1px solid #e1e5e9',
-                        borderRadius: '8px',
-                        fontSize: '14px',
-                        backgroundColor: 'white',
-                        outline: 'none'
-                      }}
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                  </div>
-                </div>
-              </div>
+                  
+                    </div>
+              </div> */}
+                
+{/* Search + Filter Section */}
+<div
+  style={{
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: '16px',
+    marginBottom: '24px',
+    padding: '20px',
+    backgroundColor: '#f8f9fa',
+    borderRadius: '12px',
+    alignItems: 'center',
+  }}
+>
+  {/* Filter Tahun */}
+  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+    <span
+      style={{
+        fontSize: '14px',
+        fontWeight: '500',
+        color: 'var(--text-dark)',
+        minWidth: '60px',
+      }}
+    >
+      Tahun:
+    </span>
+    <YearFilter selectedYear={selectedYear} onYearChange={setSelectedYear} />
+  </div>
+
+  {/* Search Input */}
+  <div style={{ flex: 1, minWidth: '250px' }}>
+    <input
+      type="text"
+      placeholder="🔍 Cari pelatihan, pegawai, atau penyelenggara..."
+      style={{
+        width: '100%',
+        padding: '10px 16px',
+        border: '1px solid #e1e5e9',
+        borderRadius: '8px',
+        fontSize: '14px',
+        backgroundColor: 'white',
+        outline: 'none',
+      }}
+      value={searchTerm}
+      onChange={(e) => setSearchTerm(e.target.value)}
+    />
+  </div>
+</div>
+
+
+
 
               {/* Tabel Analisis Pegawai */}
               {employeeAnalysis

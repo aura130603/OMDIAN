@@ -16,6 +16,7 @@ export default function EnhancedKepalaMonitoring({ user }) {
   const [selectedYear, setSelectedYear] = useState(null)
   const [sortBy, setSortBy] = useState('date')
   const [filterStatus, setFilterStatus] = useState('all')
+  const [serverStats, setServerStats] = useState(null)
 
   useEffect(() => {
     if (user && user.role === 'kepala_bps') {
@@ -34,6 +35,24 @@ export default function EnhancedKepalaMonitoring({ user }) {
       loadData()
     }
   }, [user, selectedYear, getAllUsers, getAllTrainingData])
+
+  useEffect(() => {
+    const fetchAdvancedStats = async () => {
+      try {
+        const params = selectedYear ? `?year=${selectedYear}` : ''
+        const res = await fetch(`/api/reports/advanced${params}`)
+        if (res.ok) {
+          const json = await res.json()
+          if (json.success) setServerStats(json.data)
+        } else {
+          setServerStats(null)
+        }
+      } catch (e) {
+        setServerStats(null)
+      }
+    }
+    if (user && user.role === 'kepala_bps') fetchAdvancedStats()
+  }, [user, selectedYear])
 
   const filteredAndSortedTraining = () => {
     let filtered = allTraining.filter(t => {
@@ -106,40 +125,27 @@ export default function EnhancedKepalaMonitoring({ user }) {
   }
 
   const getEmployeeAnalysis = () => {
-    const currentYear = new Date().getFullYear()
-    
+    // Use the already year-filtered allTraining (based on selectedYear)
     return allUsers.map(employee => {
       const employeeTraining = allTraining.filter(t => t.userId === employee.id)
-      const thisYearTraining = employeeTraining.filter(t => {
-        const year = new Date(t.tanggalMulai).getFullYear()
-        return year === currentYear
-      })
-      
       const totalHours = employeeTraining.reduce((sum, training) => {
         return sum + (parseInt(training.keterangan) || 0)
       }, 0)
-      
-      const thisYearHours = thisYearTraining.reduce((sum, training) => {
-        return sum + (parseInt(training.keterangan) || 0)
-      }, 0)
-      
       const withCertificate = employeeTraining.filter(t => t.sertifikat).length
       const uniqueOrganizers = [...new Set(employeeTraining.map(t => t.penyelenggara))].length
 
       return {
         ...employee,
         totalTraining: employeeTraining.length,
-        thisYearTraining: thisYearTraining.length,
         totalHours,
-        thisYearHours,
         withCertificate,
         certificateRate: employeeTraining.length > 0 ? ((withCertificate / employeeTraining.length) * 100).toFixed(1) : 0,
         uniqueOrganizers,
-        lastTraining: employeeTraining.length > 0 ? 
+        lastTraining: employeeTraining.length > 0 ?
           employeeTraining.sort((a, b) => new Date(b.tanggalMulai) - new Date(a.tanggalMulai))[0] : null,
-        status: thisYearTraining.length > 0 ? 'Aktif' : 'Perlu Perhatian'
+        status: employeeTraining.length > 0 ? 'Aktif' : 'Perlu Perhatian'
       }
-    }).sort((a, b) => b.thisYearHours - a.thisYearHours)
+    }).sort((a, b) => b.totalHours - a.totalHours)
   }
 
   const formatDate = (dateString) => {
@@ -459,22 +465,28 @@ export default function EnhancedKepalaMonitoring({ user }) {
                     Analisis detail performance dan partisipasi pelatihan per pegawai
                   </p>
                 </div>
-                <div style={{ minWidth: '300px' }}>
-                  <input
-                    type="text"
-                    placeholder="🔍 Cari nama, NIP, atau jabatan..."
-                    style={{
-                      width: '100%',
-                      padding: '10px 16px',
-                      border: '1px solid #e1e5e9',
-                      borderRadius: '8px',
-                      fontSize: '14px',
-                      backgroundColor: 'white',
-                      outline: 'none'
-                    }}
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <YearFilter
+                    selectedYear={selectedYear}
+                    onYearChange={setSelectedYear}
                   />
+                  <div style={{ minWidth: '300px' }}>
+                    <input
+                      type="text"
+                      placeholder="🔍 Cari nama, NIP, atau jabatan..."
+                      style={{
+                        width: '100%',
+                        padding: '10px 16px',
+                        border: '1px solid #e1e5e9',
+                        borderRadius: '8px',
+                        fontSize: '14px',
+                        backgroundColor: 'white',
+                        outline: 'none'
+                      }}
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -503,7 +515,7 @@ export default function EnhancedKepalaMonitoring({ user }) {
                           <th>Nama</th>
                           <th>Jabatan</th>
                           <th>Total Pelatihan</th>
-                          <th>Total Jam Tahun Ini</th>
+                          <th>Total Jam Pelatihan</th>
                           <th>Sertifikat</th>
                           <th>Progres Sertifikat</th>
                           <th>Pelatihan Terakhir</th>
@@ -523,7 +535,7 @@ export default function EnhancedKepalaMonitoring({ user }) {
                               <td><strong>{emp.nama}</strong></td>
                               <td>{emp.jabatan}</td>
                               <td>{emp.totalTraining}</td>
-                              <td>{emp.thisYearHours}</td>
+                              <td>{emp.totalHours}</td>
                               <td>{emp.withCertificate}</td>
                               <td>{emp.certificateRate}%</td>
                               <td>
@@ -576,41 +588,46 @@ export default function EnhancedKepalaMonitoring({ user }) {
                 </p>
               </div>
 
-              {/* Quick Stats Overview */}
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                gap: '20px',
-                marginBottom: '32px',
-                padding: '24px',
-                backgroundColor: '#f8f9fa',
-                borderRadius: '12px'
-              }}>
-                <div style={{ textAlign: 'center' }}>
-                  <div style={{ fontSize: '28px', fontWeight: '700', color: 'var(--primary)', marginBottom: '4px' }}>
-                    {stats.totalEmployees}
+              {/* Quick Stats Overview - API backed with client fallback */}
+              {(() => {
+                const s = serverStats || stats
+                return (
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                    gap: '20px',
+                    marginBottom: '32px',
+                    padding: '24px',
+                    backgroundColor: '#f8f9fa',
+                    borderRadius: '12px'
+                  }}>
+                    <div style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: '28px', fontWeight: '700', color: 'var(--primary)', marginBottom: '4px' }}>
+                        {s.totalEmployees}
+                      </div>
+                      <div style={{ fontSize: '13px', color: 'var(--text-medium)' }}>Total Pegawai</div>
+                    </div>
+                    <div style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: '28px', fontWeight: '700', color: 'var(--success)', marginBottom: '4px' }}>
+                        {s.thisYearTraining}
+                      </div>
+                      <div style={{ fontSize: '13px', color: 'var(--text-medium)' }}>Pelatihan Tahun Ini</div>
+                    </div>
+                    <div style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: '28px', fontWeight: '700', color: 'var(--info)', marginBottom: '4px' }}>
+                        {s.totalHours}
+                      </div>
+                      <div style={{ fontSize: '13px', color: 'var(--text-medium)' }}>Total Jam Pelatihan</div>
+                    </div>
+                    <div style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: '28px', fontWeight: '700', color: 'var(--warning)', marginBottom: '4px' }}>
+                        {s.completionRate}%
+                      </div>
+                      <div style={{ fontSize: '13px', color: 'var(--text-medium)' }}>Tingkat Partisipasi</div>
+                    </div>
                   </div>
-                  <div style={{ fontSize: '13px', color: 'var(--text-medium)' }}>Total Pegawai</div>
-                </div>
-                <div style={{ textAlign: 'center' }}>
-                  <div style={{ fontSize: '28px', fontWeight: '700', color: 'var(--success)', marginBottom: '4px' }}>
-                    {stats.thisYearTraining}
-                  </div>
-                  <div style={{ fontSize: '13px', color: 'var(--text-medium)' }}>Pelatihan Tahun Ini</div>
-                </div>
-                <div style={{ textAlign: 'center' }}>
-                  <div style={{ fontSize: '28px', fontWeight: '700', color: 'var(--info)', marginBottom: '4px' }}>
-                    {stats.totalHours}
-                  </div>
-                  <div style={{ fontSize: '13px', color: 'var(--text-medium)' }}>Total Jam Pelatihan</div>
-                </div>
-                <div style={{ textAlign: 'center' }}>
-                  <div style={{ fontSize: '28px', fontWeight: '700', color: 'var(--warning)', marginBottom: '4px' }}>
-                    {stats.completionRate}%
-                  </div>
-                  <div style={{ fontSize: '13px', color: 'var(--text-medium)' }}>Tingkat Partisipasi</div>
-                </div>
-              </div>
+                )
+              })()}
 
               {/* Report Cards */}
               <div style={{
@@ -758,27 +775,27 @@ export default function EnhancedKepalaMonitoring({ user }) {
                         width: '40px',
                         height: '40px',
                         borderRadius: '10px',
-                        backgroundColor: stats.completionRate >= 80 ? '#e7f5e7' : stats.completionRate >= 60 ? '#fff3cd' : '#f8d7da',
+                        backgroundColor: (serverStats?.completionRate ?? stats.completionRate) >= 80 ? '#e7f5e7' : (serverStats?.completionRate ?? stats.completionRate) >= 60 ? '#fff3cd' : '#f8d7da',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                         marginRight: '12px'
                       }}>
-                        {stats.completionRate >= 80 ? '✅' : stats.completionRate >= 60 ? '���️' : '🚨'}
+                        {(serverStats?.completionRate ?? stats.completionRate) >= 80 ? '✅' : (serverStats?.completionRate ?? stats.completionRate) >= 60 ? '⚠️' : '🚨'}
                       </div>
                       <div>
                         <h4 style={{ fontSize: '16px', fontWeight: '600', margin: '0 0 4px 0', color: 'var(--primary-darkest)' }}>
                           Partisipasi Pegawai
                         </h4>
                         <div style={{ fontSize: '14px', color: 'var(--text-medium)' }}>
-                          {stats.completionRate}% dari target
+                          {(serverStats?.completionRate ?? stats.completionRate)}% dari target
                         </div>
                       </div>
                     </div>
                     <p style={{ margin: '0', fontSize: '14px', color: 'var(--text-dark)' }}>
-                      {stats.completionRate >= 80 ?
+                      {(serverStats?.completionRate ?? stats.completionRate) >= 80 ?
                         'Tingkat partisipasi sangat baik, pertahankan momentum ini' :
-                        stats.completionRate >= 60 ?
+                        (serverStats?.completionRate ?? stats.completionRate) >= 60 ?
                         'Perlu peningkatan partisipasi, dorong lebih banyak pegawai' :
                         'Butuh perhatian khusus, review strategi pelatihan'
                       }

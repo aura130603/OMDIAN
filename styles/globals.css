@@ -544,6 +544,19 @@ a {
   margin: 2px;
 }
 
+.notice {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--primary-medium);
+  background: var(--primary-light);
+  color: var(--primary-darkest);
+  margin: 10px 0 16px;
+}
+
+.notice-success {
+  border-left: 4px solid var(--success);
+}
+
 .btn-add {
   background-color: var(--success);
   color: var(--white);

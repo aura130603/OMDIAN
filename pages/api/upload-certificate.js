@@ -32,14 +32,15 @@ export default async function handler(req, res) {
       maxFileSize: MAX_FILE_SIZE,
       maxFiles: 1,
       filter: function (part) {
-        return part.name === 'certificate' && ALLOWED_TYPES.includes(part.mimetype)
+        return (part.name === 'certificate' || part.name === 'sertifikat') && ALLOWED_TYPES.includes(part.mimetype)
       }
     })
 
-    // Parse the form (formidable v3 returns an object with fields and files)
-    const { fields, files } = await form.parse(req)
+    // Parse the form (formidable v3 returns [fields, files])
+    const [fields, files] = await form.parse(req)
 
-    const uploaded = files.certificate
+    // Support multiple possible field names, default to first file if present
+    const uploaded = (files && (files.certificate || files.sertifikat)) || (files ? Object.values(files)[0] : undefined)
     const file = Array.isArray(uploaded) ? uploaded[0] : uploaded
 
     if (!file) {

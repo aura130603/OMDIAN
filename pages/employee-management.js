@@ -14,6 +14,14 @@ export default function EmployeeManagement() {
   const [editingEmployee, setEditingEmployee] = useState(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedYear, setSelectedYear] = useState(null)
+  const [notice, setNotice] = useState(null)
+  const [confirmDelete, setConfirmDelete] = useState({ open: false, employeeId: null })
+
+  useEffect(() => {
+    if (!notice) return
+    const t = setTimeout(() => setNotice(null), 3000)
+    return () => clearTimeout(t)
+  }, [notice])
 
   useEffect(() => {
     if (!loading && (!user || (user.role !== 'admin' && user.role !== 'kepala_bps'))) {
@@ -49,28 +57,29 @@ export default function EmployeeManagement() {
     setShowModal(true)
   }
 
-  const handleDeleteEmployee = async (employeeId) => {
-    if (window.confirm('Apakah Anda yakin ingin menghapus data pegawai ini?')) {
-      try {
-        const result = await deleteUser(employeeId)
-        if (result.success) {
-          // Immediately update the local state to remove the deleted employee
-          setAllUsers(prevUsers => prevUsers.filter(user => user.id !== employeeId))
+  const handleDeleteEmployee = (employeeId) => {
+    setConfirmDelete({ open: true, employeeId })
+  }
 
-          // Also refresh data from API to ensure consistency
-          const updatedUsers = await getAllUsers()
-          const updatedTraining = await getAllTrainingData()
-          setAllUsers(updatedUsers)
-          setAllTraining(updatedTraining)
-
-          alert('Pegawai berhasil dihapus')
-        } else {
-          alert(result.message || 'Gagal menghapus pegawai')
-        }
-      } catch (error) {
-        console.error('Error deleting employee:', error)
-        alert('Terjadi kesalahan saat menghapus pegawai')
+  const confirmDeleteYes = async () => {
+    const employeeId = confirmDelete.employeeId
+    try {
+      const result = await deleteUser(employeeId)
+      if (result.success) {
+        setAllUsers(prevUsers => prevUsers.filter(user => user.id !== employeeId))
+        const updatedUsers = await getAllUsers()
+        const updatedTraining = await getAllTrainingData()
+        setAllUsers(updatedUsers)
+        setAllTraining(updatedTraining)
+        setNotice({ type: 'success', message: 'Pegawai berhasil dihapus' })
+      } else {
+        alert(result.message || 'Gagal menghapus pegawai')
       }
+    } catch (error) {
+      console.error('Error deleting employee:', error)
+      alert('Terjadi kesalahan saat menghapus pegawai')
+    } finally {
+      setConfirmDelete({ open: false, employeeId: null })
     }
   }
 
@@ -94,7 +103,7 @@ export default function EmployeeManagement() {
           setAllUsers(updatedUsers)
 
           setShowModal(false)
-          alert('Data pegawai berhasil diperbarui')
+          setNotice({ type: 'success', message: 'Data berhasil diperbarui' })
         } else {
           alert(result.message || 'Gagal memperbarui data pegawai')
         }
@@ -107,7 +116,7 @@ export default function EmployeeManagement() {
           setAllUsers(updatedUsers)
 
           setShowModal(false)
-          alert('Pegawai berhasil ditambahkan')
+          setNotice({ type: 'success', message: 'Berhasil akun menambahkan pegawai baru' })
         } else {
           alert(result.message || 'Gagal menambahkan pegawai')
         }
@@ -185,6 +194,11 @@ export default function EmployeeManagement() {
 
       <div className="container">
         <div className="dashboard-content">
+          {notice && (
+            <div className={`notice ${notice.type === 'success' ? 'notice-success' : ''}`} role="status" aria-live="polite">
+              {notice.message}
+            </div>
+          )}
           <div className="card">
             <div className="card-header">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
@@ -347,6 +361,24 @@ export default function EmployeeManagement() {
           onSave={handleSaveEmployee}
           onClose={() => setShowModal(false)}
         />
+      )}
+
+      {confirmDelete.open && (
+        <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && setConfirmDelete({ open: false, employeeId: null })}>
+          <div className="modal-content" style={{ maxWidth: '420px' }}>
+            <div className="modal-header">
+              <h2 className="modal-title">Konfirmasi Hapus Pegawai</h2>
+              <button className="btn-close" onClick={() => setConfirmDelete({ open: false, employeeId: null })}>✕</button>
+            </div>
+            <div style={{ padding: '10px 0', color: 'var(--primary-darkest)' }}>
+              Apakah Anda yakin untuk menghapus Pegawai?
+            </div>
+            <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+              <button className="btn btn-secondary" style={{ flex: 1 }} onClick={() => setConfirmDelete({ open: false, employeeId: null })}>Tidak</button>
+              <button className="btn btn-primary" style={{ flex: 1 }} onClick={confirmDeleteYes}>Iya</button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )

@@ -13,6 +13,7 @@ export default function EmployeeModal({ employee, onSave, onClose }) {
   })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
 
   useEffect(() => {
     if (employee) {
@@ -122,17 +123,28 @@ export default function EmployeeModal({ employee, onSave, onClose }) {
               <label htmlFor="password" className="form-label">
                 Password {employee ? '(kosongkan jika tidak ingin mengubah)' : '*'}
               </label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                className="form-input"
-                value={formData.password}
-                onChange={handleChange}
-                required={!employee}
-                placeholder={employee ? "Biarkan kosong jika tidak mengubah" : "Minimal 6 karakter"}
-                minLength={6}
-              />
+              <div className="password-input-wrapper">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  id="password"
+                  name="password"
+                  className="form-input"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required={!employee}
+                  placeholder={employee ? "Biarkan kosong jika tidak mengubah" : "Minimal 6 karakter"}
+                  minLength={6}
+                  aria-label="Password"
+                />
+                <button
+                  type="button"
+                  className="password-toggle"
+                  aria-label={showPassword ? 'Sembunyikan password' : 'Tampilkan password'}
+                  onClick={() => setShowPassword(v => !v)}
+                  title={showPassword ? 'Sembunyikan password' : 'Tampilkan password'}
+                >
+                </button>
+              </div>
             </div>
           </div>
 

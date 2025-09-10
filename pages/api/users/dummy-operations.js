@@ -89,5 +89,23 @@ export const DUMMY_USERS = [
     role: 'pegawai',
     status: 'aktif',
     created_at: '2024-01-01 10:00:00'
+  },
+  {
+    id: 6,
+    username: 'kepala1',
+    password: 'kepala123',
+    nip: '196010051985031001',
+    nama: 'Dr. Soekarno Wijaya, M.Si',
+    pangkat: 'Pembina Utama Muda',
+    golongan: 'IV/c',
+    jabatan: 'Kepala BPS Kabupaten Kudus',
+    pendidikan: 'S3 Statistik',
+    nilai_skp: 98,
+    hukuman_disiplin: 'Tidak Pernah',
+    diklat_pim: 'Sudah',
+    diklat_fungsional: 'Sudah',
+    role: 'kepala_bps',
+    status: 'aktif',
+    created_at: '2024-01-01 10:00:00'
   }
-]
+];

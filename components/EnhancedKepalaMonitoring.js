@@ -700,7 +700,7 @@ export default function EnhancedKepalaMonitoring({ user }) {
               {/* Report Cards */}
               <div style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
                 gap: '24px',
                 marginBottom: '32px'
               }}>
@@ -831,7 +831,7 @@ export default function EnhancedKepalaMonitoring({ user }) {
                 }}>
                   🔍 Insight Strategis
                 </h3>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
                   <div style={{
                     backgroundColor: 'white',
                     padding: '20px',

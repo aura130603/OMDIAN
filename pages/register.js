@@ -182,8 +182,8 @@ export default function Register() {
                   required
                 >
                   <option value="">Pilih Golongan</option>
-                  <option value="II/a">II/a</option>
-                  <option value="II/b">II/b</option>
+                  {/* <option value="II/a">II/a</option>
+                  <option value="II/b">II/b</option> */}
                   <option value="II/c">II/c</option>
                   <option value="II/d">II/d</option>
                   <option value="III/a">III/a</option>
@@ -233,7 +233,7 @@ export default function Register() {
                 <option value="">Pilih Pendidikan</option>
                 <option value="SMA/SMK">SMA/SMK</option>
                 <option value="D3">D3</option>
-                <option value="S1">S1</option>
+                <option value="S1">D4/S1</option>
                 <option value="S2">S2</option>
                 <option value="S3">S3</option>
               </select>

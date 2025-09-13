@@ -4,9 +4,9 @@
   "/_document": "pages/_document.js",
   "/login": "pages/login.js",
   "/api/training": "pages/api/training.js",
-  "/api/auth/login": "pages/api/auth/login.js",
+  "/statistics": "pages/statistics.js",
   "/dashboard": "pages/dashboard.js",
-  "/employee-management": "pages/employee-management.js",
+  "/api/auth/login": "pages/api/auth/login.js",
   "/api/users": "pages/api/users.js",
   "/training-history": "pages/training-history.js"
 }

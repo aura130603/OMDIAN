@@ -133,7 +133,7 @@ export default function EmployeeDashboard({ user }) {
                             {training.keterangan} jam
                           </span>
                         </td>
-                        <td>
+                        {/* <td>
                           {training.sertifikat ? (
                             <a 
                               href="#" 
@@ -147,7 +147,24 @@ export default function EmployeeDashboard({ user }) {
                               Belum diunggah
                             </span>
                           )}
-                        </td>
+                        </td> */}
+                        <td>
+  {training.sertifikat ? (
+    <a 
+      href={training.sertifikat}  // langsung ambil dari database
+      className="auth-link"
+      title="Lihat Sertifikat"
+      target="_blank"  // buka tab baru
+      rel="noopener noreferrer"  // aman untuk link eksternal
+    >
+      📄 Lihat
+    </a>
+  ) : (
+    <span style={{ color: 'var(--text-medium)' }}>
+      Belum diunggah
+    </span>
+  )}
+</td>
                         <td>
                           <button 
                             className="btn btn-small btn-secondary"

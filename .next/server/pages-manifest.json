@@ -3,10 +3,12 @@
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
   "/login": "pages/login.js",
+  "/api/auth/login": "pages/api/auth/login.js",
   "/api/training": "pages/api/training.js",
   "/statistics": "pages/statistics.js",
+  "/training-history": "pages/training-history.js",
+  "/enhanced-monitoring": "pages/enhanced-monitoring.js",
   "/dashboard": "pages/dashboard.js",
-  "/api/auth/login": "pages/api/auth/login.js",
-  "/api/users": "pages/api/users.js",
-  "/training-history": "pages/training-history.js"
+  "/api/reports/advanced": "pages/api/reports/advanced.js",
+  "/api/users": "pages/api/users.js"
 }
